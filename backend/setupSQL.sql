@@ -1,5 +1,5 @@
 create database vaccine_app;
-
+use vaccine_app;
 
 create table vaccine(
     name VARCHAR(25),
@@ -30,4 +30,24 @@ create table vaccine_user(
 
 );
 
+alter table vaccine_user
+DROP column image;
 
+alter table vaccine_user
+ADD image VARCHAR(110);
+
+insert into user(first_name, last_name, age, username, password)
+VALUES
+('Ford', 'Jackson',21, 'fordj626', 'temppass'),
+('Leo','Messi', 35,'Goat10', 'tp2');
+
+select * from user;
+
+insert into vaccine(name, number_doses, manufacturer)
+VALUES
+('Covid-19 vaccine', 2, 'Phizer'),
+('Covid-19 vaccine', 1, 'J&J');
+
+insert into vaccine_user(username, manufacturer, name, date)
+VALUES
+('fordj626','Phizer','Covid-19 vaccine','2021-09-04');
