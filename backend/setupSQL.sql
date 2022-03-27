@@ -17,6 +17,10 @@ create table user(
     username VARCHAR(15) PRIMARY KEY,
     password VARCHAR(25) NOT NULL
 );
+alter table user
+drop column age;
+alter table user
+ADD column age VARCHAR(3);
 
 
 create table vaccine_user(
@@ -38,8 +42,8 @@ ADD image VARCHAR(110);
 
 insert into user(first_name, last_name, age, username, password)
 VALUES
-('Ford', 'Jackson',21, 'fordj626', 'temppass'),
-('Leo','Messi', 35,'Goat10', 'tp2');
+('Ford', 'Jackson','21', 'fordj626', 'temppass'),
+('Leo','Messi', '35','Goat10', 'tp2');
 
 select * from user;
 
@@ -51,3 +55,8 @@ VALUES
 insert into vaccine_user(username, manufacturer, name, date)
 VALUES
 ('fordj626','Phizer','Covid-19 vaccine','2021-09-04');
+
+select * from user;
+
+delete from user
+WHERE username = 'NULL';
