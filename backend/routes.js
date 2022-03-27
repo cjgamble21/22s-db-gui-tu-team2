@@ -101,6 +101,32 @@ module.exports = function routes(app, logger) {
       }
     });
   });
+  //post for vaccine side affects
+  app.post('/side-affects', (req, res) => {
+    console.log(req.body);
+    const payload = req.query;
+    console.log(payload);
+    // obtain a connection from our pool of connections
+    pool.getConnection(function (err, connection){
+      if(err){
+        // if there is an issue obtaining a connection, release the connection instance and log the error
+        logger.error('Problem obtaining MySQL connection',err)
+        res.status(400).send('Problem obtaining MySQL connection'); 
+      } else {
+        // if there is no issue obtaining a connection, execute query and release connection
+        connection.query('INSERT INTO side_affects (`vacc_name`,`vacc_manu`,`side_affect`) VALUES(?,?,?)',[payload.name,payload.manufacturer,payload.side_affect], function (err, rows, fields) {
+          connection.release();
+          if (err) {
+            // if there is an error with the query, log the error
+            logger.error("Problem inserting into test table: \n", err);
+            res.status(400).send('Problem inserting into table'); 
+          } else {
+            res.status(200).send(`added ${req.query.side_affect} to the table for vaccine ${payload.name} made by ${payload.manufacturer}`);
+          }
+        });
+      }
+    });
+  });
   // GET /checkdb
   app.get('/users', (req, res) => {
     // obtain a connection from our pool of connections
@@ -128,10 +154,10 @@ module.exports = function routes(app, logger) {
       }
     });
   });
-
-  //get vaccines info
-  app.get('/vaccine', (req, res) => {
+  // GET specific user
+  app.get('/users/:id', (req, res) => {
     // obtain a connection from our pool of connections
+    const id = req.params.id;
     pool.getConnection(function (err, connection){
       if(err){
         // if there is an issue obtaining a connection, release the connection instance and log the error
@@ -139,7 +165,7 @@ module.exports = function routes(app, logger) {
         res.status(400).send('Problem obtaining MySQL connection'); 
       } else {
         // if there is no issue obtaining a connection, execute query and release connection
-        connection.query('SELECT * FROM `vaccine_app`.`vaccine`', function (err, rows, fields) {
+        connection.query('SELECT first_name,last_name, age FROM `vaccine_app`.`user` WHERE username = ?',[id], function (err, rows, fields) {
           connection.release();
           if (err) {
             logger.error("Error while fetching values: \n", err);
@@ -153,6 +179,99 @@ module.exports = function routes(app, logger) {
             });
           }
         });
+      }
+    });
+  });
+
+  //get vaccines info
+  app.get('/vaccine', (req, res) => {
+    // obtain a connection from our pool of connections
+    pool.getConnection(function (err, connection){
+      if(err){
+        // if there is an issue obtaining a connection, release the connection instance and log the error
+        logger.error('Problem obtaining MySQL connection',err)
+        res.status(400).send('Problem obtaining MySQL connection'); 
+      } else {
+        // if there is no issue obtaining a connection, execute query and release connection
+        const vacc_name = req.query.name
+        const vacc_man = req.query.manufacturer 
+        if(vacc_name && vacc_man){
+          connection.query('SELECT * FROM `vaccine_app`.`vaccine` WHERE name = ? AND manufacturer = ?', [vacc_name,vacc_man], function (err, rows, fields) {
+            connection.release();
+            if (err) {
+              logger.error("Error while fetching values: \n", err);
+              res.status(400).json({
+                "data": [],
+                "error": "Error obtaining values"
+              })
+            } else {
+              res.status(200).json({
+                "data": rows
+              });
+            }
+          });
+        }else{
+          connection.query('SELECT * FROM `vaccine_app`.`vaccine`', function (err, rows, fields) {
+            connection.release();
+            if (err) {
+              logger.error("Error while fetching values: \n", err);
+              res.status(400).json({
+                "data": [],
+                "error": "Error obtaining values"
+              })
+            } else {
+              res.status(200).json({
+                "data": rows
+              });
+            }
+          });
+        }
+      }
+    });
+  });
+  //get vaccine side effects route
+  app.get('/side-affects', (req, res) => {
+    // obtain a connection from our pool of connections
+    pool.getConnection(function (err, connection){
+      if(err){
+        // if there is an issue obtaining a connection, release the connection instance and log the error
+        logger.error('Problem obtaining MySQL connection',err)
+        res.status(400).send('Problem obtaining MySQL connection'); 
+      } else {
+        // if there is no issue obtaining a connection, execute query and release connection
+        const vacc_name = req.query.name
+        const vacc_man = req.query.manufacturer 
+        if(vacc_name && vacc_man){
+          connection.query('SELECT (side_affect) FROM `vaccine_app`.`side_affects` WHERE vacc_name = ? AND vacc_manu = ?', [vacc_name,vacc_man], function (err, rows, fields) {
+            connection.release();
+            if (err) {
+              logger.error("Error while fetching values: \n", err);
+              res.status(400).json({
+                "data": [],
+                "error": "Error obtaining values"
+              })
+            } else {
+              res.status(200).json({
+                "data": rows
+              });
+            }
+          });
+        }else{
+          connection.query('SELECT * FROM `vaccine_app`.`side_affects`', function (err, rows, fields) {
+            connection.release();
+            if (err) {
+              logger.error("Error while fetching values: \n", err);
+              res.status(400).json({
+                "data": [],
+                "error": "Error obtaining values"
+              })
+            } else {
+              res.status(200).json({
+                "data": rows
+              });
+            }
+          });
+        }
       }
     });
   });

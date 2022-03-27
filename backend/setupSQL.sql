@@ -7,6 +7,7 @@ create table vaccine(
     manufacturer VARCHAR(25),
     PRIMARY KEY (name,manufacturer)
 );
+CREATE INDEX vaccine_key ON vaccine(name,manufacturer);
 ALTER TABLE vaccine
 ADD column time_valid INT;
 
@@ -21,7 +22,14 @@ alter table user
 drop column age;
 alter table user
 ADD column age VARCHAR(3);
+create table side_affects(
+    vacc_name VARCHAR(25) NOT NULL ,
+    vacc_manu VARCHAR(25) NOT NULL ,
+    side_affect VARCHAR(100) NOT NULL ,
+    FOREIGN KEY (vacc_name,vacc_manu) REFERENCES vaccine(name,manufacturer),
+    PRIMARY KEY (vacc_name,vacc_manu,side_affect)
 
+);
 
 create table vaccine_user(
     username VARCHAR(15) REFERENCES user(username),
@@ -55,6 +63,10 @@ VALUES
 insert into vaccine_user(username, manufacturer, name, date)
 VALUES
 ('fordj626','Phizer','Covid-19 vaccine','2021-09-04');
+insert into side_affects(vacc_name, vacc_manu, side_affect) VALUES
+('Covid-19 vaccine', 'J&J', 'Runny nose'),
+('Covid-19 vaccine', 'J&J', 'Trouble breathing'),
+('Covid-19 vaccine', 'Phizer', 'microchip implanted');
 
 select * from user;
 
