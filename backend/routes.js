@@ -127,6 +127,34 @@ module.exports = function routes(app, logger) {
       }
     });
   });
+  //add new viewer to account
+  app.post('/users/viewers/:id', (req, res) => {
+    console.log(req.body);
+    const payload = req.query;
+    const id = req.params.id;
+    console.log(payload);
+    // obtain a connection from our pool of connections
+    pool.getConnection(function (err, connection){
+      if(err){
+        // if there is an issue obtaining a connection, release the connection instance and log the error
+        logger.error('Problem obtaining MySQL connection',err)
+        res.status(400).send('Problem obtaining MySQL connection'); 
+      } else {
+        // if there is no issue obtaining a connection, execute query and release connection
+        connection.query('INSERT INTO viewer (`record_holder`,`viewer`,`relationship`) VALUES(?,?,?)',[id,payload.viewer,payload.relation], function (err, rows, fields) {
+          connection.release();
+          if (err) {
+            // if there is an error with the query, log the error
+            logger.error("Problem inserting into test table: \n", err);
+            res.status(400).send('Problem inserting into table'); 
+          } else {
+            res.status(200).send(`added ${payload.viewer} as a viewer for ${id}`);
+          }
+        });
+      }
+    });
+  });
+
   // GET /checkdb
   app.get('/users', (req, res) => {
     // obtain a connection from our pool of connections
@@ -183,6 +211,34 @@ module.exports = function routes(app, logger) {
     });
   });
 
+  //see who can view your vaccination status
+  app.get('/users/viewers/:id', (req, res) => {
+      // obtain a connection from our pool of connections
+      const id = req.params.id;
+      pool.getConnection(function (err, connection){
+        if(err){
+          // if there is an issue obtaining a connection, release the connection instance and log the error
+          logger.error('Problem obtaining MySQL connection',err)
+          res.status(400).send('Problem obtaining MySQL connection'); 
+        } else {
+          // if there is no issue obtaining a connection, execute query and release connection
+          connection.query('SELECT viewer, first_name,last_name FROM `vaccine_app`.`viewer` JOIN user t on t.username = viewer.viewer WHERE record_holder = ?',[id], function (err, rows, fields) {
+            connection.release();
+            if (err) {
+              logger.error("Error while fetching values: \n", err);
+              res.status(400).json({
+                "data": [],
+                "error": "Error obtaining values"
+              })
+            } else {
+              res.status(200).json({
+                "data": rows
+              });
+            }
+          });
+        }
+      });
+    });
   //get vaccines info
   app.get('/vaccine', (req, res) => {
     // obtain a connection from our pool of connections
@@ -319,6 +375,33 @@ module.exports = function routes(app, logger) {
 
         }
     }
+    });
+  });
+
+  //delete viewer of record
+  app.delete('/users/viewers/:id', (req,res) =>{
+    const id = req.params.id;
+    const view = req.query.viewer
+    pool.getConnection(function (err, connection){
+      if(err){
+        // if there is an issue obtaining a connection, release the connection instance and log the error
+        logger.error('Problem obtaining MySQL connection',err)
+        res.status(400).send('Problem obtaining MySQL connection'); 
+      } else {
+        // if there is no issue obtaining a connection, execute query and release connection
+        connection.query('DELETE from viewer WHERE record_holder = ? AND viewer = ?',[id, view] , function (err, rows, fields) {
+          connection.release();
+          if (err) {
+            logger.error("Error while fetching values: \n", err);
+            res.status(400).json({
+              "data": [],
+              "error": "Error obtaining values"
+            })
+          } else {
+            res.status(200).send(`Deleted ${view} as a viewer for ${id}`);
+          }
+        });
+      }
     });
   });
 }

@@ -22,6 +22,9 @@ alter table user
 drop column age;
 alter table user
 ADD column age VARCHAR(3);
+alter table user
+ADD COLUMN email VARCHAR(20);
+
 create table side_affects(
     vacc_name VARCHAR(25) NOT NULL ,
     vacc_manu VARCHAR(25) NOT NULL ,
@@ -40,6 +43,12 @@ create table vaccine_user(
     FOREIGN KEY (name,manufacturer) REFERENCES vaccine(name, manufacturer),
     image VARCHAR(110) NOT NULL
 
+);
+
+create table viewer(
+    record_holder VARCHAR(15) references user(username), -- user who is adding a viewer
+    viewer VARCHAR(15) references user(username), -- username of person to view the account
+    relationship VARCHAR(25)
 );
 
 alter table vaccine_user
@@ -68,7 +77,5 @@ insert into side_affects(vacc_name, vacc_manu, side_affect) VALUES
 ('Covid-19 vaccine', 'J&J', 'Trouble breathing'),
 ('Covid-19 vaccine', 'Phizer', 'microchip implanted');
 
-select * from user;
-
-delete from user
-WHERE username = 'NULL';
+insert into viewer(record_holder, viewer, relationship) VALUES
+('fordj626','chefcurry','Manager at work');
