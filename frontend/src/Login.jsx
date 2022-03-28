@@ -126,7 +126,7 @@ const Login = () => {
                                 Don't have an account? <br />
                                 <span className='register-link'>
                                     {/* Add router here */}
-                                    <Link to="/register">Register</Link>
+                                    <Link to="../register">Register</Link>
                                 </span>
                             </p>
                         </div>

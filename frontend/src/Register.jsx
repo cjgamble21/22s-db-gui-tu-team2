@@ -57,6 +57,7 @@ const Register = () => {
         if (validUsername && validPassword && passwordsMatch) {
             console.log("Success!");
             setSuccess(true);
+            setAuth(true);
         }
     }
 
@@ -70,7 +71,7 @@ const Register = () => {
                 <div className="text-center bg">
                     <form onSubmit={handleSubmit} className="form-signin justify-content-center text-align-center">
                         <img src={vax} className="mb-3" height="200" alt="Vax-Img" />
-                        <h1 className="mb-3">Login</h1>
+                        <h1 className="mb-3">Register</h1>
                         <div className="form-group mb-3">
                             <label htmlFor="username">Username</label>
                             <input
@@ -119,7 +120,7 @@ const Register = () => {
                         </div>}
 
                         <div className="mt-3 mb-3">
-                            <button className="btn btn-lg btn-primary w-100">Login</button>
+                            <button className="btn btn-lg btn-primary w-100">Register</button>
                         </div>
                         {/* {error && <div className="login-error">
                             <p>{error}</p>
