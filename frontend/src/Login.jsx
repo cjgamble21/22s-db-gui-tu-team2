@@ -6,7 +6,7 @@ import vax from './images/Vax.png';
 
 const Login = () => {
     const USERNAME_REGEX = /^[a-zA-Z0-9_-]{3,}$/;
-    const PASSWORD_REGEX = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{3,}$/;
+    const PASSWORD_REGEX = /^[a-zA-Z0-9_-]{3,}$/;
 
     const { setAuth } = useContext(AuthContext);
     const userRef = useRef();
@@ -36,6 +36,7 @@ const Login = () => {
     useEffect(() => {
         setValidUsername(true);
         setValidPassword(true);
+        setError(false);
     }, [username, password])
 
     // Method which facilitates form validation
@@ -94,7 +95,7 @@ const Login = () => {
                                 required>
                             </input>
                             {!validUsername && <div className="username-error">
-                                <p>Please provide a username with 3 or more characters</p>
+                                <p>Username must be 3 or more characters</p>
                             </div>}
                         </div>
 
@@ -109,7 +110,7 @@ const Login = () => {
                                 required>
                             </input>
                             {!validPassword && <div className="password-error">
-                                <p>Please provide a password with 3 or more characters</p>
+                                <p>Password must be 3 or more characters</p>
                             </div>}
                         </div>
 

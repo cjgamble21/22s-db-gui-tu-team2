@@ -19,3 +19,11 @@
 .login img {
     color: #eee;
 }
+
+.password-error, .username-error, .login-error {
+    color: red;
+}
+
+.password-error, .username-error {
+    text-align: left;
+}
