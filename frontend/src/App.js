@@ -1,13 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import './App.css';
 import Login from './Login'
+import Home from './Home'
 import axios from 'axios';
-import { UserContext } from './UserContext';
+import { ReactDOM } from 'react-dom';
 
 // React functional component
 const App = () => {
   // User object will be in the global context so every component can access it
   const [user, setUser] = useState(null);
+
+  // This ensures that userValue will change only when the user or setUser values change
+  const userValue = useMemo(() => ({ user, setUser }), [user, setUser]);
 
   // ENTER YOUR EC2 PUBLIC IP/URL HERE
   const ec2_url = ''
@@ -18,9 +22,9 @@ const App = () => {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <Login />
-      </header>
+      {/* <header className="App-header"> */}
+      <Login />
+      {/* </header> */}
     </div>
   );
 }
