@@ -38,6 +38,7 @@ const Login = () => {
         setValidPassword(true);
     }, [username, password])
 
+    // Method which facilitates form validation
     const validate = () => {
         if (!USERNAME_REGEX.test(username)) {
             setValidUsername(false);
@@ -76,9 +77,9 @@ const Login = () => {
                     {navigate("/")}
                 </div>
             ) : (
-                <div className="text-center mt-5">
-                    <form onSubmit={handleSubmit} className="form-signin">
-                        <img src={vax} className="vax-img mb-3" height="200" />
+                <div className="text-center bg">
+                    <form onSubmit={handleSubmit} className="form-signin justify-content-center text-align-center">
+                        <img src={vax} className="mb-3" height="200" alt="Vax-Img" />
                         <h1 className="mb-3">Login</h1>
                         <div className="form-group mb-3">
                             <label htmlFor="username">Username</label>

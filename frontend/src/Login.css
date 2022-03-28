@@ -1,12 +1,15 @@
-.login form {
-    max-width: 30rem;
-    margin: auto;
-    background-color: #E0E0E0;
-    padding: 3rem 5rem;
+.login .bg {
+    height: 100vh;
+    background-color:#E0E0E0;
 }
 
-.login input[type="text"] {
-
+.login form {
+    max-width: 30rem;
+    margin: 0 auto;
+    background-color: #F8F8F8;
+    padding: 3rem 5rem;
+    position: relative;
+    top: 15vh;
 }
 
 .login label {
