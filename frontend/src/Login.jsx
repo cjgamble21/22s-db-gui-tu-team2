@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState, useContext } from 'react';
 import { AuthContext } from './AuthProvider';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const USERNAME_REGEX = /^[a-zA-Z0-9_-]{3,}$/;
@@ -7,7 +8,6 @@ const Login = () => {
 
     const { setAuth } = useContext(AuthContext);
     const userRef = useRef();
-    const errRef = useRef();
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -18,8 +18,10 @@ const Login = () => {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
 
+    const navigate = useNavigate();
+
     const admin = {
-        username: 'cjgamble21',
+        username: 'user',
         password: '1234'
     }
 
@@ -61,7 +63,7 @@ const Login = () => {
         } else {
             console.log("Login unsuccessful!");
             console.log(error);
-            setError('Error!');
+            setError('Login failed.');
         }
     }
 
@@ -69,11 +71,7 @@ const Login = () => {
         <>
             {success ? (
                 <div className="login-success-page">
-                    <h1>You have been logged in!</h1>
-                    <br />
-                    <p>
-                        <a href="#">Go to Home</a>
-                    </p>
+                    {navigate("/")}
                 </div>
             ) : (
                 <div className="login-wrapper">
@@ -103,6 +101,10 @@ const Login = () => {
                         </input>
                         {!validPassword && <div className="password-error">
                             <p>Please provide a password with 3 or more characters</p>
+                        </div>}
+
+                        {error && <div className="login-error">
+                            <p>{error}</p>
                         </div>}
 
                         <button>Login</button>
