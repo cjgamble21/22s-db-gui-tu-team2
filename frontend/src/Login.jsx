@@ -1,6 +1,8 @@
 import { useRef, useEffect, useState, useContext } from 'react';
 import { AuthContext } from './AuthProvider';
 import { useNavigate } from 'react-router-dom';
+import './Login.css';
+import vax from './images/Vax.png';
 
 const Login = () => {
     const USERNAME_REGEX = /^[a-zA-Z0-9_-]{3,}$/;
@@ -68,57 +70,68 @@ const Login = () => {
     }
 
     return (
-        <>
+        <div className="login">
             {success ? (
                 <div className="login-success-page">
                     {navigate("/")}
                 </div>
             ) : (
-                <div className="login-wrapper">
-                    <h1>Login</h1>
-                    <form onSubmit={handleSubmit} className="login-form">
-                        <label htmlFor="username">Username</label>
-                        <input
-                            type="text"
-                            id="username"
-                            ref={userRef} // ref for focusing purposes
-                            autoComplete="off"
-                            onChange={e => setUsername(e.target.value)}
-                            value={username}
-                            required>
-                        </input>
-                        {!validUsername && <div className="username-error">
-                            <p>Please provide a username with 3 or more characters</p>
-                        </div>}
+                <div className="text-center mt-5">
+                    <form onSubmit={handleSubmit} className="form-signin">
+                        <img src={vax} className="vax-img mb-3" height="200" />
+                        <h1 className="mb-3">Login</h1>
+                        <div className="form-group mb-3">
+                            <label htmlFor="username">Username</label>
+                            <input
+                                type="text"
+                                id="username"
+                                className="form-control"
+                                ref={userRef} // ref for focusing purposes
+                                autoComplete="off"
+                                onChange={e => setUsername(e.target.value)}
+                                value={username}
+                                required>
+                            </input>
+                            {!validUsername && <div className="username-error">
+                                <p>Please provide a username with 3 or more characters</p>
+                            </div>}
+                        </div>
 
-                        <label htmlFor="password">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            onChange={e => setPassword(e.target.value)}
-                            value={password}
-                            required>
-                        </input>
-                        {!validPassword && <div className="password-error">
-                            <p>Please provide a password with 3 or more characters</p>
-                        </div>}
+                        <div className="form-group mb-3">
+                            <label htmlFor="password">Password</label>
+                            <input
+                                type="password"
+                                id="password"
+                                className="form-control"
+                                onChange={e => setPassword(e.target.value)}
+                                value={password}
+                                required>
+                            </input>
+                            {!validPassword && <div className="password-error">
+                                <p>Please provide a password with 3 or more characters</p>
+                            </div>}
+                        </div>
 
+                        <div className="mt-3 mb-3">
+                            <button className="btn btn-lg btn-primary w-100">Login</button>
+                        </div>
                         {error && <div className="login-error">
                             <p>{error}</p>
                         </div>}
 
-                        <button>Login</button>
+                        <div className="mt-4">
+                            <p>
+                                Don't have an account? <br />
+                                <span className='register-link'>
+                                    {/* Add router here */}
+                                    <a href="#">Register</a>
+                                </span>
+                            </p>
+                        </div>
                     </form>
-                    <p>
-                        Don't have an account? <br />
-                        <span className='register-link'>
-                            {/* Add router here */}
-                            <a href="#">Register</a>
-                        </span>
-                    </p>
                 </div>
             )}
-        </>
+        </div>
     )
 }
 

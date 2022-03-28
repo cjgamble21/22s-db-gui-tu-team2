@@ -1,9 +1,7 @@
-import React, { useState, useMemo } from 'react';
 import './App.css';
 import Login from './Login'
 import Home from './Home'
 import axios from 'axios';
-import { ReactDOM } from 'react-dom';
 import { Outlet, Routes, Route } from 'react-router-dom';
 import { RequireAuth } from './RequireAuth';
 
@@ -20,11 +18,11 @@ const App = () => {
     <div className="App">
       <Routes>
         <Route path="/" element={<Outlet />}>
-          // Protected route
+          {/* Protected route */}
           <Route element={<RequireAuth />}>
             <Route path="/" element={<Home />} />
           </Route>
-          // Public route
+          {/* Public route */}
           <Route path="login" element={<Login />} />
         </Route>
       </Routes>
