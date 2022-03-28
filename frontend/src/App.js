@@ -1,5 +1,6 @@
 import './App.css';
 import Login from './Login'
+import Register from './Register'
 import Home from './Home'
 import axios from 'axios';
 import { Outlet, Routes, Route } from 'react-router-dom';
@@ -24,6 +25,7 @@ const App = () => {
           </Route>
           {/* Public route */}
           <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
         </Route>
       </Routes>
     </div >

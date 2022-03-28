@@ -1,10 +1,11 @@
 import { useRef, useEffect, useState, useContext } from 'react';
 import { AuthContext } from './AuthProvider';
 import { useNavigate, Link } from 'react-router-dom';
-import './Login.css';
+import './Register.css';
 import vax from './images/Vax.png';
 
-const Login = () => {
+
+const Register = () => {
     const USERNAME_REGEX = /^[a-zA-Z0-9_-]{3,}$/;
     const PASSWORD_REGEX = /^[a-zA-Z0-9_-]{3,}$/;
 
@@ -13,31 +14,26 @@ const Login = () => {
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [passwordConfirmation, setPasswordConfirmation] = useState("");
 
     const [validUsername, setValidUsername] = useState(true);
     const [validPassword, setValidPassword] = useState(true);
+    const [passwordsMatch, setPasswordsMatch] = useState(true);
 
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
 
     const navigate = useNavigate();
 
-    const admin = {
-        username: 'user',
-        password: '1234'
-    }
-
-    // On page load, focus the username field
     useEffect(() => {
         userRef.current.focus();
-    }, []);
+    }, [])
 
-    // When the username or password fields are updated, remove any error messages
     useEffect(() => {
         setValidUsername(true);
         setValidPassword(true);
-        setError(false);
-    }, [username, password])
+        setPasswordConfirmation(true);
+    }, [username, password, passwordConfirmation])
 
     // Method which facilitates form validation
     const validate = () => {
@@ -48,33 +44,26 @@ const Login = () => {
         if (!PASSWORD_REGEX.test(password)) {
             setValidPassword(false);
         }
+
+        if (password !== passwordConfirmation) {
+            setPasswordsMatch(false);
+        }
     }
 
-    // Function for handling login form submission
     const handleSubmit = e => {
         e.preventDefault();
-        console.log(username, password);
-
         validate();
 
-        // Obviously, this will be changed to an API call once the backend registration is set up
-        if (username === admin.username && password === admin.password) {
-            setAuth({ username, password });
+        if (validUsername && validPassword && passwordsMatch) {
+            console.log("Success!");
             setSuccess(true);
-            setUsername("");
-            setPassword("");
-            console.log("Logged in!");
-        } else {
-            console.log("Login unsuccessful!");
-            console.log(error);
-            setError('Login failed.');
         }
     }
 
     return (
-        <div className="login">
+        <div className="register">
             {success ? (
-                <div className="login-success-page">
+                <div className="register-success-page">
                     {navigate("/")}
                 </div>
             ) : (
@@ -114,22 +103,27 @@ const Login = () => {
                             </div>}
                         </div>
 
+                        <div className="form-group mb-3">
+                            <label htmlFor="passwordConfirmation">Confirm Password</label>
+                            <input
+                                type="password"
+                                id="passwordConfirmation"
+                                className="form-control"
+                                onChange={e => setPasswordConfirmation(e.target.value)}
+                                value={passwordConfirmation}
+                                required>
+                            </input>
+                        </div>
+                        {!passwordConfirmation && <div className="confirmation-error">
+                            <p>Passwords must match</p>
+                        </div>}
+
                         <div className="mt-3 mb-3">
                             <button className="btn btn-lg btn-primary w-100">Login</button>
                         </div>
-                        {error && <div className="login-error">
+                        {/* {error && <div className="login-error">
                             <p>{error}</p>
-                        </div>}
-
-                        <div className="mt-4">
-                            <p>
-                                Don't have an account? <br />
-                                <span className='register-link'>
-                                    {/* Add router here */}
-                                    <Link to="/register">Register</Link>
-                                </span>
-                            </p>
-                        </div>
+                        </div>} */}
                     </form>
                 </div>
             )}
@@ -137,4 +131,4 @@ const Login = () => {
     )
 }
 
-export default Login;
+export default Register;
