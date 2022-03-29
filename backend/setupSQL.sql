@@ -16,14 +16,14 @@ create table user(
     last_name VARCHAR(25) NOT NULL,
     age INT NOT NULL,
     username VARCHAR(15) PRIMARY KEY,
-    password VARCHAR(25) NOT NULL
+    password VARCHAR(100) NOT NULL
 );
 alter table user
 drop column age;
 alter table user
 ADD column age VARCHAR(3);
 alter table user
-ADD COLUMN email VARCHAR(20);
+ADD COLUMN email VARCHAR(20) UNIQUE ;
 
 create table side_affects(
     vacc_name VARCHAR(25) NOT NULL ,
