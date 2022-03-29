@@ -36,7 +36,7 @@ const Login = () => {
     useEffect(() => {
         setValidUsername(true);
         setValidPassword(true);
-        setError(false);
+        setSuccess(false);
     }, [username, password])
 
     // Method which facilitates form validation

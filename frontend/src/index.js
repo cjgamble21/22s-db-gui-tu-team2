@@ -12,6 +12,6 @@ ReactDOM.render(
             <Routes>
                 <Route path="/*" element={<App />} />
             </Routes>
-        </AuthProvider>
+        </AuthProvider>,
     </BrowserRouter>,
     document.getElementById('root'));

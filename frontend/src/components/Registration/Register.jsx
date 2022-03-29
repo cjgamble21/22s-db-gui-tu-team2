@@ -33,7 +33,7 @@ const Register = () => {
         setValidUsername(true);
         setValidPassword(true);
         setPasswordsMatch(true);
-    }, [username, password, passwordsMatch])
+    }, [username, password, passwordConfirmation])
 
     // Method which facilitates form validation
     const validate = () => {
@@ -52,21 +52,30 @@ const Register = () => {
 
     const handleSubmit = e => {
         e.preventDefault();
+        console.log(validUsername);
+        console.log(validPassword);
+        console.log(passwordsMatch);
         validate();
+        console.log(validUsername);
+        console.log(validPassword);
+        console.log(passwordsMatch);
 
         if (validUsername && validPassword && passwordsMatch) {
             console.log("Success!");
             setSuccess(true);
             setAuth({ username, password });
+        } else {
+            console.log("Failure");
+            setError('Registration failed.');
         }
     }
 
     return (
         <div className="register">
             {success ? (
-                <div className="register-success-page">
+                <>
                     {navigate("/")}
-                </div>
+                </>
             ) : (
                 <div className="text-center bg">
                     <form onSubmit={handleSubmit} className="form-signin justify-content-center text-align-center">
@@ -115,7 +124,7 @@ const Register = () => {
                                 required>
                             </input>
                         </div>
-                        {!passwordConfirmation && <div className="confirmation-error">
+                        {!passwordsMatch && <div className="confirmation-error">
                             <p>Passwords must match</p>
                         </div>}
 
