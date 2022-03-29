@@ -1,5 +1,5 @@
 const pool = require('./db');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 
 
@@ -85,8 +85,8 @@ module.exports = function routes(app, logger) {
     console.log(req.query);
     const payload = req.body;
     const password = payload.password;
-    const salt = bcrypt.genSaltSync(10);
-    const hashword = bcrypt.hashSync(password, salt);
+    // const salt = bcrypt.genSaltSync(10);
+    const hashword = bcrypt.hashSync(password, 10);
     
     console.log(payload);
     // obtain a connection from our pool of connections
@@ -186,6 +186,39 @@ module.exports = function routes(app, logger) {
             res.status(200).send(`added ${payload.name} as a vaccine for ${id}`);
           }
         });
+      }
+    });
+  });
+
+  //authenticate user
+  app.post('/session',  async (req, res) => {
+    console.log(req.body);
+    const payload = req.body;
+    const password = payload.password;
+    // obtain a connection from our pool of connections
+    pool.getConnection(function (err, connection){
+      if(err){
+        // if there is an issue obtaining a connection, release the connection instance and log the error
+        logger.error('Problem obtaining MySQL connection',err)
+        res.status(400).send('Problem obtaining MySQL connection'); 
+      } else {
+        // if there is no issue obtaining a connection, execute query and release connection
+        connection.query('Select * from user WHERE email = ? OR username = ? ',[payload.email, payload.username], (err, rows, fields) => {
+          
+          const user = rows[0];
+          console.log(password + " " + user.password);
+          
+          const validPassword = bcrypt.compareSync(password, user.password);
+          console.log(validPassword);
+          if (err) {
+            // if there is an error with the query, log the error
+            logger.error("Problem inserting into test table: \n", err);
+            res.status(400).send('Problem inserting into table'); 
+          } else {
+            res.status(201).json(validPassword);
+          }
+        });
+        connection.release();
       }
     });
   });
