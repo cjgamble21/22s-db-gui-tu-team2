@@ -1,4 +1,7 @@
-const pool = require('./db')
+const pool = require('./db');
+const bcrypt = require('bcrypt');
+
+
 
 module.exports = function routes(app, logger) {
   // GET /
@@ -75,10 +78,16 @@ module.exports = function routes(app, logger) {
   });
   //post for users
   const bodyParser = require('body-parser');
+  
+
   app.use(bodyParser.json());
   app.post('/users', (req, res) => {
-    console.log(req.body);
-    const payload = req.query;
+    console.log(req.query);
+    const payload = req.body;
+    const password = payload.password;
+    const salt = bcrypt.genSaltSync(10);
+    const hashword = bcrypt.hashSync(password, salt);
+    
     console.log(payload);
     // obtain a connection from our pool of connections
     pool.getConnection(function (err, connection){
@@ -88,14 +97,14 @@ module.exports = function routes(app, logger) {
         res.status(400).send('Problem obtaining MySQL connection'); 
       } else {
         // if there is no issue obtaining a connection, execute query and release connection
-        connection.query('INSERT INTO user (`first_name`,`last_name`,`age`,`username`,`password`) VALUES(?,?,?,?,?)',[payload.first_name,payload.last_name,payload.age,payload.username,payload.password], function (err, rows, fields) {
+        connection.query('INSERT INTO user (`first_name`,`last_name`,`age`,`username`,`password`,`email`) VALUES(?,?,?,?,?,?)',[payload.first_name,payload.last_name,payload.age,payload.username,hashword,payload.email], function (err, rows, fields) {
           connection.release();
           if (err) {
             // if there is an error with the query, log the error
             logger.error("Problem inserting into test table: \n", err);
             res.status(400).send('Problem inserting into table'); 
           } else {
-            res.status(200).send(`added ${req.query.first_name} to the table!`)
+            res.status(200).send(`added ${req.body.first_name} to the table!`)
           }
         });
       }
@@ -104,7 +113,7 @@ module.exports = function routes(app, logger) {
   //post for vaccine side affects
   app.post('/side-affects', (req, res) => {
     console.log(req.body);
-    const payload = req.query;
+    const payload = req.body;
     console.log(payload);
     // obtain a connection from our pool of connections
     pool.getConnection(function (err, connection){
@@ -121,7 +130,7 @@ module.exports = function routes(app, logger) {
             logger.error("Problem inserting into test table: \n", err);
             res.status(400).send('Problem inserting into table'); 
           } else {
-            res.status(200).send(`added ${req.query.side_affect} to the table for vaccine ${payload.name} made by ${payload.manufacturer}`);
+            res.status(200).send(`added ${payload.side_affect} to the table for vaccine ${payload.name} made by ${payload.manufacturer}`);
           }
         });
       }
@@ -130,9 +139,9 @@ module.exports = function routes(app, logger) {
   //add new viewer to account
   app.post('/users/viewers/:id', (req, res) => {
     console.log(req.body);
-    const payload = req.query;
+    const payload = req.body;
     const id = req.params.id;
-    console.log(payload);
+   
     // obtain a connection from our pool of connections
     pool.getConnection(function (err, connection){
       if(err){
@@ -141,7 +150,7 @@ module.exports = function routes(app, logger) {
         res.status(400).send('Problem obtaining MySQL connection'); 
       } else {
         // if there is no issue obtaining a connection, execute query and release connection
-        connection.query('INSERT INTO viewer (`record_holder`,`viewer`,`relationship`) VALUES(?,?,?)',[id,payload.viewer,payload.relation], function (err, rows, fields) {
+        connection.query('INSERT INTO viewer (`record_holder`,`viewer_email`,`relationship`) VALUES(?,?,?)',[id,payload.viewer_email,payload.relation], function (err, rows, fields) {
           connection.release();
           if (err) {
             // if there is an error with the query, log the error
@@ -154,6 +163,33 @@ module.exports = function routes(app, logger) {
       }
     });
   });
+  app.post('/users/:id/dose', (req, res) => {
+    console.log(req.body);
+    const payload = req.body;
+    const id = req.params.id;
+    console.log(payload);
+    // obtain a connection from our pool of connections
+    pool.getConnection(function (err, connection){
+      if(err){
+        // if there is an issue obtaining a connection, release the connection instance and log the error
+        logger.error('Problem obtaining MySQL connection',err)
+        res.status(400).send('Problem obtaining MySQL connection'); 
+      } else {
+        // if there is no issue obtaining a connection, execute query and release connection
+        connection.query('INSERT INTO vaccine_user (`username`,`name`,`manufacturer`,`date`,`private`,`image`) VALUES(?,?,?,?,?,?)',[id,payload.name,payload.manufacturer,payload.date,payload.private,payload.image], function (err, rows, fields) {
+          connection.release();
+          if (err) {
+            // if there is an error with the query, log the error
+            logger.error("Problem inserting into test table: \n", err);
+            res.status(400).send('Problem inserting into table'); 
+          } else {
+            res.status(200).send(`added ${payload.name} as a vaccine for ${id}`);
+          }
+        });
+      }
+    });
+  });
+
 
   // GET /checkdb
   app.get('/users', (req, res) => {
@@ -390,6 +426,34 @@ module.exports = function routes(app, logger) {
       } else {
         // if there is no issue obtaining a connection, execute query and release connection
         connection.query('DELETE from viewer WHERE record_holder = ? AND viewer = ?',[id, view] , function (err, rows, fields) {
+          connection.release();
+          if (err) {
+            logger.error("Error while fetching values: \n", err);
+            res.status(400).json({
+              "data": [],
+              "error": "Error obtaining values"
+            })
+          } else {
+            res.status(200).send(`Deleted ${view} as a viewer for ${id}`);
+          }
+        });
+      }
+    });
+  });
+
+  //delete vaccine from record
+  app.delete('/users/:id', (req,res) =>{
+    const id = req.params.id;
+    const name = req.query.name
+    const manu = req.query.manufacturer
+    pool.getConnection(function (err, connection){
+      if(err){
+        // if there is an issue obtaining a connection, release the connection instance and log the error
+        logger.error('Problem obtaining MySQL connection',err)
+        res.status(400).send('Problem obtaining MySQL connection'); 
+      } else {
+        // if there is no issue obtaining a connection, execute query and release connection
+        connection.query('DELETE from vaccine_user WHERE username = ? AND name = ? AND manufacturer = ?',[id, manu,name ] , function (err, rows, fields) {
           connection.release();
           if (err) {
             logger.error("Error while fetching values: \n", err);
