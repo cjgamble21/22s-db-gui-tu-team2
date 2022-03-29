@@ -1,15 +1,15 @@
 import { useRef, useEffect, useState, useContext } from 'react';
-import { AuthContext } from './AuthProvider';
+import useAuth from '../../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
 import './Register.css';
-import vax from './images/Vax.png';
+import vax from '../../images/Vax.png';
 
 
 const Register = () => {
     const USERNAME_REGEX = /^[a-zA-Z0-9_-]{3,}$/;
     const PASSWORD_REGEX = /^[a-zA-Z0-9_-]{3,}$/;
 
-    const { setAuth } = useContext(AuthContext);
+    const { setAuth } = useAuth();
     const userRef = useRef();
 
     const [username, setUsername] = useState("");
@@ -32,8 +32,8 @@ const Register = () => {
     useEffect(() => {
         setValidUsername(true);
         setValidPassword(true);
-        setPasswordConfirmation(true);
-    }, [username, password, passwordConfirmation])
+        setPasswordsMatch(true);
+    }, [username, password, passwordsMatch])
 
     // Method which facilitates form validation
     const validate = () => {
@@ -57,7 +57,7 @@ const Register = () => {
         if (validUsername && validPassword && passwordsMatch) {
             console.log("Success!");
             setSuccess(true);
-            setAuth(true);
+            setAuth({ username, password });
         }
     }
 
@@ -105,10 +105,10 @@ const Register = () => {
                         </div>
 
                         <div className="form-group mb-3">
-                            <label htmlFor="passwordConfirmation">Confirm Password</label>
+                            <label htmlFor="confirmation">Confirm Password</label>
                             <input
                                 type="password"
-                                id="passwordConfirmation"
+                                id="confirmation"
                                 className="form-control"
                                 onChange={e => setPasswordConfirmation(e.target.value)}
                                 value={passwordConfirmation}

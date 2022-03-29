@@ -5,11 +5,10 @@ The plan here is to send user to a page they attempted to access after logging i
 */
 
 import { useLocation, Navigate, Outlet } from "react-router-dom";
-import { useContext } from 'react';
-import { AuthContext } from './AuthProvider';
+import useAuth from './hooks/useAuth';
 
 export const RequireAuth = () => {
-    const { auth } = useContext(AuthContext);
+    const { auth } = useAuth();
 
     const location = useLocation();
 

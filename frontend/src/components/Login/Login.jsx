@@ -1,14 +1,14 @@
-import { useRef, useEffect, useState, useContext } from 'react';
-import { AuthContext } from './AuthProvider';
+import { useRef, useEffect, useState } from 'react';
+import useAuth from '../../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
 import './Login.css';
-import vax from './images/Vax.png';
+import vax from '../../images/Vax.png';
 
 const Login = () => {
     const USERNAME_REGEX = /^[a-zA-Z0-9_-]{3,}$/;
     const PASSWORD_REGEX = /^[a-zA-Z0-9_-]{3,}$/;
 
-    const { setAuth } = useContext(AuthContext);
+    const { setAuth } = useAuth();
     const userRef = useRef();
 
     const [username, setUsername] = useState("");
@@ -74,9 +74,9 @@ const Login = () => {
     return (
         <div className="login">
             {success ? (
-                <div className="login-success-page">
+                <>
                     {navigate("/")}
-                </div>
+                </>
             ) : (
                 <div className="text-center bg">
                     <form onSubmit={handleSubmit} className="form-signin justify-content-center text-align-center">
@@ -126,7 +126,7 @@ const Login = () => {
                                 Don't have an account? <br />
                                 <span className='register-link'>
                                     {/* Add router here */}
-                                    <Link to="../register">Register</Link>
+                                    <Link to="/register">Register</Link>
                                 </span>
                             </p>
                         </div>

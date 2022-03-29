@@ -1,7 +1,7 @@
 import './App.css';
-import Login from './Login'
-import Register from './Register'
-import Home from './Home'
+import Login from './components/Login/Login'
+import Register from './components/Registration/Register'
+import Home from './components/Home'
 import axios from 'axios';
 import { Outlet, Routes, Route } from 'react-router-dom';
 import { RequireAuth } from './RequireAuth';
