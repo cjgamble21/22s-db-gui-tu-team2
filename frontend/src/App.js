@@ -19,11 +19,13 @@ const App = () => {
     <div className="App">
       <Routes>
         <Route path="/" element={<Outlet />}>
-          {/* Protected route */}
+
+          {/* Protected routes */}
           <Route element={<RequireAuth />}>
             <Route path="/" element={<Home />} />
           </Route>
-          {/* Public route */}
+
+          {/* Public routes */}
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
         </Route>

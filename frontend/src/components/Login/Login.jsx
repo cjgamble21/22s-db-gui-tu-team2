@@ -60,9 +60,10 @@ const Login = () => {
         // Obviously, this will be changed to an API call once the backend registration is set up
         if (username === admin.username && password === admin.password) {
             setAuth({ username, password });
-            setSuccess(true);
             setUsername("");
             setPassword("");
+            setSuccess(true);
+            navigate('/');
             console.log("Logged in!");
         } else {
             console.log("Login unsuccessful!");
@@ -73,66 +74,59 @@ const Login = () => {
 
     return (
         <div className="login">
-            {success ? (
-                <>
-                    {navigate("/")}
-                </>
-            ) : (
-                <div className="text-center bg">
-                    <form onSubmit={handleSubmit} className="form-signin justify-content-center text-align-center">
-                        <img src={vax} className="mb-3" height="200" alt="Vax-Img" />
-                        <h1 className="mb-3">Login</h1>
-                        <div className="form-group mb-3">
-                            <label htmlFor="username">Username</label>
-                            <input
-                                type="text"
-                                id="username"
-                                className="form-control"
-                                ref={userRef} // ref for focusing purposes
-                                autoComplete="off"
-                                onChange={e => setUsername(e.target.value)}
-                                value={username}
-                                required>
-                            </input>
-                            {!validUsername && <div className="username-error">
-                                <p>Username must be 3 or more characters</p>
-                            </div>}
-                        </div>
-
-                        <div className="form-group mb-3">
-                            <label htmlFor="password">Password</label>
-                            <input
-                                type="password"
-                                id="password"
-                                className="form-control"
-                                onChange={e => setPassword(e.target.value)}
-                                value={password}
-                                required>
-                            </input>
-                            {!validPassword && <div className="password-error">
-                                <p>Password must be 3 or more characters</p>
-                            </div>}
-                        </div>
-
-                        <div className="mt-3 mb-3">
-                            <button className="btn btn-lg btn-primary w-100">Login</button>
-                        </div>
-                        {error && <div className="login-error">
-                            <p>{error}</p>
+            <div className="text-center bg">
+                <form onSubmit={handleSubmit} className="form-signin justify-content-center text-align-center">
+                    <img src={vax} className="mb-3" height="200" alt="Vax-Img" />
+                    <h1 className="mb-3">Login</h1>
+                    <div className="form-group mb-3">
+                        <label htmlFor="username">Username</label>
+                        <input
+                            type="text"
+                            id="username"
+                            className="form-control"
+                            ref={userRef} // ref for focusing purposes
+                            autoComplete="off"
+                            onChange={e => setUsername(e.target.value)}
+                            value={username}
+                            required>
+                        </input>
+                        {!validUsername && <div className="username-error">
+                            <p>Username must be 3 or more characters</p>
                         </div>}
+                    </div>
 
-                        <div className="mt-4">
-                            <p>
-                                Don't have an account? <br />
-                                <span className='register-link'>
-                                    {/* Add router here */}
-                                    <Link to="/register">Register</Link>
-                                </span>
-                            </p>
-                        </div>
-                    </form>
-                </div>
-            )}
+                    <div className="form-group mb-3">
+                        <label htmlFor="password">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            className="form-control"
+                            onChange={e => setPassword(e.target.value)}
+                            value={password}
+                            required>
+                        </input>
+                        {!validPassword && <div className="password-error">
+                            <p>Password must be 3 or more characters</p>
+                        </div>}
+                    </div>
+
+                    <div className="mt-3 mb-3">
+                        <button className="btn btn-lg btn-primary w-100">Login</button>
+                    </div>
+                    {error && <div className="login-error">
+                        <p>{error}</p>
+                    </div>}
+
+                    <div className="mt-4">
+                        <p>
+                            Don't have an account? <br />
+                            <span className='register-link'>
+                                <Link to="/register">Register</Link>
+                            </span>
+                        </p>
+                    </div>
+                </form>
+            </div>
         </div>
     )
 }
