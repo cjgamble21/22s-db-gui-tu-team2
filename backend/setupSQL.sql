@@ -45,6 +45,9 @@ create table vaccine_user(
 
 );
 
+
+
+
 create table viewer(
     record_holder VARCHAR(15) references user(username), -- user who is adding a viewer
     viewer VARCHAR(15) references user(username), -- username of person to view the account

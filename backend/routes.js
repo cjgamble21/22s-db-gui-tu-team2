@@ -1,7 +1,27 @@
 const pool = require('./db');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const accessTokenSecret = 'youraccesstokensecret';
+const refreshTokenSecret = 'yourrefreshtokensecrethere';
+let refreshTokens = [];
+const authenticateJWT = (req, res, next) => {
+  const authHeader = req.headers.authorization;
 
+  if (authHeader) {
+      const token = authHeader.split(' ')[1];
 
+      jwt.verify(token, accessTokenSecret, (err, user) => {
+          if (err) {
+              return res.sendStatus(403);
+          }
+
+          req.user = user;
+          next();
+      });
+  } else {
+      res.sendStatus(401);
+  }
+};
 
 module.exports = function routes(app, logger) {
   // GET /
@@ -45,7 +65,7 @@ module.exports = function routes(app, logger) {
   //     }
   //   });
   // });
-
+  
   //health route
   app.get('/health', (req,res) => {
     const responseBody = { status: 'up', port:'8000' };
@@ -82,35 +102,6 @@ module.exports = function routes(app, logger) {
 
   app.use(bodyParser.json());
 
-  // app.post('/users', (req, res) => {
-  //   console.log(req.query);
-  //   const payload = req.body;
-  //   const password = payload.password;
-  //   // const salt = bcrypt.genSaltSync(10);
-  //   const hashword = bcrypt.hashSync(password, 10);
-    
-  //   console.log(payload);
-  //   // obtain a connection from our pool of connections
-  //   pool.getConnection(function (err, connection){
-  //     if(err){
-  //       // if there is an issue obtaining a connection, release the connection instance and log the error
-  //       logger.error('Problem obtaining MySQL connection',err)
-  //       res.status(400).send('Problem obtaining MySQL connection'); 
-  //     } else {
-  //       // if there is no issue obtaining a connection, execute query and release connection
-  //       connection.query('INSERT INTO user (`first_name`,`last_name`,`age`,`username`,`password`,`email`) VALUES(?,?,?,?,?,?)',[payload.first_name,payload.last_name,payload.age,payload.username,hashword,payload.email], function (err, rows, fields) {
-  //         connection.release();
-  //         if (err) {
-  //           // if there is an error with the query, log the error
-  //           logger.error("Problem inserting into test table: \n", err);
-  //           res.status(400).send('Problem inserting into table'); 
-  //         } else {
-  //           res.status(200).send(`added ${req.body.first_name} to the table!`)
-  //         }
-  //       });
-  //     }
-  //   });
-  // });
   //post for vaccine side affects
   app.post('/side-affects', (req, res) => {
     console.log(req.body);
@@ -182,82 +173,46 @@ module.exports = function routes(app, logger) {
         connection.query('Select * from user WHERE email = ? OR username = ? ',[payload.email, payload.username], (err, rows, fields) => {
           
           const user = rows[0];
-          console.log(password + " " + user.password);
-          
           const validPassword = bcrypt.compareSync(password, user.password);
+          
           console.log(validPassword);
+          
+
+          
           if (err) {
             // if there is an error with the query, log the error
             logger.error("Problem inserting into test table: \n", err);
             res.status(400).send('Problem inserting into table'); 
           } else {
-            res.status(201).json(validPassword);
+            if (validPassword){
+              const accessToken = jwt.sign({ username: user.username}, accessTokenSecret, { expiresIn: '1m' });
+              const refreshToken = jwt.sign({ username: user.username}, refreshTokenSecret);
+
+              refreshTokens.push(refreshToken);
+
+              res.json({
+                accessToken,
+                refreshToken
+            });
+          }else {
+              res.send('Username or password incorrect');
+            }
           }
         });
         connection.release();
       }
     });
   });
+  app.post('/logout', (req, res) => {
+    
+    const { token } = req.body;
+    refreshTokens = refreshTokens.filter(t => t !== token);
+
+    res.send("Logout successful");
+});
 
 
-  // GET /checkdb
-  // app.get('/users', (req, res) => {
-  //   // obtain a connection from our pool of connections
-  //   pool.getConnection(function (err, connection){
-  //     if(err){
-  //       // if there is an issue obtaining a connection, release the connection instance and log the error
-  //       logger.error('Problem obtaining MySQL connection',err)
-  //       res.status(400).send('Problem obtaining MySQL connection'); 
-  //     } else {
-  //       // if there is no issue obtaining a connection, execute query and release connection
-  //       connection.query('SELECT first_name,last_name, age FROM `vaccine_app`.`user`', function (err, rows, fields) {
-  //         connection.release();
-  //         if (err) {
-  //           logger.error("Error while fetching values: \n", err);
-  //           res.status(400).json({
-  //             "data": [],
-  //             "error": "Error obtaining values"
-  //           })
-  //         } else {
-  //           res.status(200).json({
-  //             "data": rows
-  //           });
-  //         }
-  //       });
-  //     }
-  //   });
-  // });
-  // GET specific user
-  // app.get('/users/:id', (req, res) => {
-  //   // obtain a connection from our pool of connections
-  //   const id = req.params.id;
-  //   pool.getConnection(function (err, connection){
-  //     if(err){
-  //       // if there is an issue obtaining a connection, release the connection instance and log the error
-  //       logger.error('Problem obtaining MySQL connection',err)
-  //       res.status(400).send('Problem obtaining MySQL connection'); 
-  //     } else {
-  //       // if there is no issue obtaining a connection, execute query and release connection
-  //       connection.query('SELECT first_name,last_name, age FROM `vaccine_app`.`user` WHERE username = ?',[id], function (err, rows, fields) {
-  //         connection.release();
-  //         if (err) {
-  //           logger.error("Error while fetching values: \n", err);
-  //           res.status(400).json({
-  //             "data": [],
-  //             "error": "Error obtaining values"
-  //           })
-  //         } else {
-  //           res.status(200).json({
-  //             "data": rows
-  //           });
-  //         }
-  //       });
-  //     }
-  //   });
-  // });
 
-  //see who can view your vaccination status
-  
   //get vaccines info
   app.get('/vaccine', (req, res) => {
     // obtain a connection from our pool of connections
@@ -314,8 +269,8 @@ module.exports = function routes(app, logger) {
         res.status(400).send('Problem obtaining MySQL connection'); 
       } else {
         // if there is no issue obtaining a connection, execute query and release connection
-        const vacc_name = req.query.name
-        const vacc_man = req.query.manufacturer 
+        const vacc_name = req.body.name
+        const vacc_man = req.body.manufacturer 
         if(vacc_name && vacc_man){
           connection.query('SELECT (side_affect) FROM `vaccine_app`.`side_affects` WHERE vacc_name = ? AND vacc_manu = ?', [vacc_name,vacc_man], function (err, rows, fields) {
             connection.release();
@@ -351,7 +306,7 @@ module.exports = function routes(app, logger) {
     });
   });
   //get vaccines for a certain user
-  app.get('/vaccine_doses', (req, res) => {
+  app.get('/vaccine_doses', authenticateJWT, (req, res) => {
     // obtain a connection from our pool of connections
     pool.getConnection(function (err, connection){
       if(err){
@@ -361,8 +316,9 @@ module.exports = function routes(app, logger) {
       } else {
         // if there is no issue obtaining a connection, execute query and release connection
         const username = req.query.username;
+        console.log(username);
         if(username){
-          connection.query('SELECT * FROM `vaccine_app`.`vaccine_user` WHERE username = ? ',[username], function (err, rows, fields) {
+          connection.query('SELECT * FROM `vaccine_app`.`vaccine_user` WHERE username = ?',[username], function (err, rows, fields) {
             connection.release();
             if (err) {
               logger.error("Error while fetching values: \n", err);
@@ -424,11 +380,35 @@ module.exports = function routes(app, logger) {
     });
   });
 
+  app.post('/token', (req, res) => {
+    const { token } = req.body;
+
+    if (!token) {
+        return res.sendStatus(401);
+    }
+
+    if (!refreshTokens.includes(token)) {
+        return res.sendStatus(403);
+    }
+
+    jwt.verify(token, refreshTokenSecret, (err, user) => {
+        if (err) {
+            return res.sendStatus(403);
+        }
+
+        const accessToken = jwt.sign({ username: user.username}, accessTokenSecret, { expiresIn: '1m' });
+
+        res.json({
+            accessToken
+        });
+    });
+});
+
   //delete vaccine from record
   app.delete('/users/:id', (req,res) =>{
     const id = req.params.id;
-    const name = req.query.name
-    const manu = req.query.manufacturer
+    const name = req.body.name;
+    const manu = req.body.manufacturer;
     pool.getConnection(function (err, connection){
       if(err){
         // if there is an issue obtaining a connection, release the connection instance and log the error
@@ -436,7 +416,7 @@ module.exports = function routes(app, logger) {
         res.status(400).send('Problem obtaining MySQL connection'); 
       } else {
         // if there is no issue obtaining a connection, execute query and release connection
-        connection.query('DELETE from vaccine_user WHERE username = ? AND name = ? AND manufacturer = ?',[id, manu,name ] , function (err, rows, fields) {
+        connection.query('DELETE from vaccine_user WHERE username = ? AND name = ? AND manufacturer = ?',[id, name, manu] , function (err, rows, fields) {
           connection.release();
           if (err) {
             logger.error("Error while fetching values: \n", err);
@@ -445,10 +425,14 @@ module.exports = function routes(app, logger) {
               "error": "Error obtaining values"
             })
           } else {
-            res.status(200).send(`Deleted ${view} as a viewer for ${id}`);
+            res.status(200).send(`Deleted ${name}  from user ${id}`);
           }
         });
       }
     });
   });
+
+
+
+
 }

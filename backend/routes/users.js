@@ -2,6 +2,8 @@ const bcrypt = require('bcryptjs');
 const pool = require('../db');
 const express = require('express');
 const router = express.Router();
+
+//default route
 router.post('/', (req, res) => {
     const payload = req.body;
     const password = payload.password;
