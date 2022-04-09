@@ -3,6 +3,7 @@ import useAuth from '../../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
 import './Login.css';
 import vax from '../../images/Vax.png';
+import InputField from '../InputField';
 
 const Login = () => {
     const USERNAME_REGEX = /^[a-zA-Z0-9_-]{3,}$/;
@@ -10,6 +11,8 @@ const Login = () => {
 
     const { setAuth } = useAuth();
     const userRef = useRef();
+    const passwordRef = useRef();
+    const firstRender = useRef(true);
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -38,32 +41,45 @@ const Login = () => {
     //     setValidPassword(true);
     //     setSuccess(false);
     // }, [username, password])
-    useEffect(() => {
-        console.log("Set to true")
-        setValidUsername(true);
-    }, [username])
 
-    useEffect(() => {
-        setValidPassword(true);
-    }, [password])
+
     // Method which facilitates form validation
     const validate = () => {
         if (!USERNAME_REGEX.test(username)) {
             setValidUsername(false);
             console.log("Set to false")
+        } else {
+            setValidUsername(true);
         }
 
         if (!PASSWORD_REGEX.test(password)) {
             setValidPassword(false);
+        } else {
+            setValidPassword(true);
         }
     }
+
+    useEffect(() => {
+        if (firstRender.current) {
+            firstRender.current = false;
+            return;
+        }
+
+        validate();
+    }, [username, password])
 
     // Function for handling login form submission
     const handleSubmit = e => {
         e.preventDefault();
         console.log(username, password);
+        console.log(success);
 
-        validate();
+        if (!validUsername || !validPassword) {
+            setError("Login failed.");
+            return;
+        }
+
+        // validate();
 
         console.log(validUsername);
         console.log(validPassword);
@@ -91,16 +107,7 @@ const Login = () => {
                     <h1 className="mb-3">Login</h1>
                     <div className="form-group mb-3">
                         <label htmlFor="username">Username</label>
-                        <input
-                            type="text"
-                            id="username"
-                            className="form-control"
-                            ref={userRef} // ref for focusing purposes
-                            autoComplete="off"
-                            onChange={e => setUsername(e.target.value)}
-                            value={username}
-                            required>
-                        </input>
+                        <InputField type="text" id="username" value={username} setValue={setUsername} ref={userRef} />
                         {!validUsername && <div className="username-error">
                             <p>Username must be 3 or more characters</p>
                         </div>}
@@ -108,14 +115,8 @@ const Login = () => {
 
                     <div className="form-group mb-3">
                         <label htmlFor="password">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            className="form-control"
-                            onChange={e => setPassword(e.target.value)}
-                            value={password}
-                            required>
-                        </input>
+                        <InputField type="password" id="password" value={password} setValue={setPassword}
+                            valid={validPassword} setValid={setValidPassword} ref={passwordRef} />
                         {!validPassword && <div className="password-error">
                             <p>Password must be 3 or more characters</p>
                         </div>}
@@ -124,7 +125,7 @@ const Login = () => {
                     <div className="mt-3 mb-3">
                         <button className="btn btn-lg btn-primary w-100">Login</button>
                     </div>
-                    {error && <div className="login-error">
+                    {!success && <div className="login-error">
                         <p>{error}</p>
                     </div>}
 
