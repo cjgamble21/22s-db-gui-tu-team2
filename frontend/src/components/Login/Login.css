@@ -1,0 +1,29 @@
+.login .bg {
+    height: 100vh;
+    background-color:#E0E0E0;
+}
+
+.login form {
+    max-width: 30rem;
+    margin: 0 auto;
+    background-color: #F8F8F8;
+    padding: 2rem 5rem;
+    position: relative;
+    top: 5%;
+}
+
+.login label {
+    float: left;
+}
+
+.login img {
+    color: #eee;
+}
+
+.password-error, .username-error, .login-error {
+    color: red;
+}
+
+.password-error, .username-error {
+    text-align: left;
+}

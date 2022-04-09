@@ -1,0 +1,29 @@
+.register .bg {
+    height: 100vh;
+    background-color:#E0E0E0;
+}
+
+.register form {
+    max-width: 30rem;
+    margin: 0 auto;
+    background-color: #F8F8F8;
+    padding: 2rem 5rem;
+    position: relative;
+    top: 5%;
+}
+
+.register label {
+    float: left;
+}
+
+.register img {
+    color: #eee;
+}
+
+.password-error, .username-error, .login-error, .confirmation-error {
+    color: red;
+}
+
+.password-error, .username-error, .confirmation-error {
+    text-align: left;
+}
