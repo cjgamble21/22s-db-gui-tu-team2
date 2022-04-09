@@ -3,6 +3,7 @@ import useAuth from '../../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
 import './Register.css';
 import vax from '../../images/Vax.png';
+import InputField from '../InputField';
 
 
 const Register = () => {
@@ -11,6 +12,9 @@ const Register = () => {
 
     const { setAuth } = useAuth();
     const userRef = useRef();
+    const passRef = useRef();
+    const confRef = useRef();
+    const firstRender = useRef(true);
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -19,6 +23,8 @@ const Register = () => {
     const [validUsername, setValidUsername] = useState(true);
     const [validPassword, setValidPassword] = useState(true);
     const [passwordsMatch, setPasswordsMatch] = useState(true);
+
+    const [formValid, setFormValid] = useState(true);
 
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
@@ -29,47 +35,47 @@ const Register = () => {
         userRef.current.focus();
     }, [])
 
-    // useEffect(() => {
-    //     setValidUsername(true);
-    // }, [username])
-
-    // useEffect(() => {
-    //     setValidPassword(true);
-    // }, [password])
-
-    // useEffect(() => {
-    //     setPasswordsMatch(true);
-    // }, [passwordConfirmation])
 
     // Method which facilitates form validation
     const validate = () => {
         if (!USERNAME_REGEX.test(username)) {
             setValidUsername(false);
+            console.log("Set to false")
+        } else {
+            setValidUsername(true);
         }
 
         if (!PASSWORD_REGEX.test(password)) {
             setValidPassword(false);
+        } else {
+            setValidPassword(true);
         }
 
         if (password !== passwordConfirmation) {
             setPasswordsMatch(false);
+        } else {
+            setPasswordsMatch(true);
         }
     }
 
     useEffect(() => {
+        if (firstRender.current) {
+            firstRender.current = false;
+            return;
+        }
+
         validate();
     }, [username, password, passwordConfirmation])
 
 
     const handleSubmit = e => {
         e.preventDefault();
-        console.log(validUsername);
-        console.log(validPassword);
-        console.log(passwordsMatch);
-        // validate();
-        console.log(validUsername);
-        console.log(validPassword);
-        console.log(passwordsMatch);
+
+        if (!validUsername || !validPassword || !passwordsMatch) {
+            setError("Registration failed.");
+            setFormValid(false);
+            return;
+        }
 
         if (validUsername && validPassword && passwordsMatch) {
             console.log("Success!");
@@ -90,57 +96,43 @@ const Register = () => {
                     <h1 className="mb-3">Register</h1>
                     <div className="form-group mb-3">
                         <label htmlFor="username">Username</label>
-                        <input
-                            type="text"
-                            id="username"
-                            className="form-control"
-                            ref={userRef} // ref for focusing purposes
-                            autoComplete="off"
-                            onChange={e => setUsername(e.target.value)}
-                            value={username}
-                            required>
-                        </input>
-                        {!validUsername && <div className="username-error">
+                        <InputField type="text" id="username" value={username} setValue={setUsername} ref={userRef} />
+                        {!validUsername && !formValid && <div className="username-error">
                             <p>Username must be 3 or more characters</p>
                         </div>}
                     </div>
 
                     <div className="form-group mb-3">
                         <label htmlFor="password">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            className="form-control"
-                            onChange={e => setPassword(e.target.value)}
-                            value={password}
-                            required>
-                        </input>
-                        {!validPassword && <div className="password-error">
+                        <InputField type="password" id="password" value={password} setValue={setPassword} ref={passRef} />
+                        {!validPassword && !formValid && <div className="password-error">
                             <p>Password must be 3 or more characters</p>
                         </div>}
                     </div>
 
                     <div className="form-group mb-3">
                         <label htmlFor="confirmation">Confirm Password</label>
-                        <input
-                            type="password"
-                            id="confirmation"
-                            className="form-control"
-                            onChange={e => setPasswordConfirmation(e.target.value)}
-                            value={passwordConfirmation}
-                            required>
-                        </input>
+                        <InputField type="password" id="confirmation" value={passwordConfirmation} setValue={setPasswordConfirmation} ref={confRef} />
                     </div>
-                    {!passwordsMatch && <div className="confirmation-error">
+                    {!passwordsMatch && !formValid && <div className="confirmation-error">
                         <p>Passwords must match</p>
                     </div>}
 
                     <div className="mt-3 mb-3">
                         <button className="btn btn-lg btn-primary w-100">Register</button>
                     </div>
-                    {/* {error && <div className="login-error">
-                            <p>{error}</p>
-                        </div>} */}
+                    {!success && <div className="login-error">
+                        <p>{error}</p>
+                    </div>}
+
+                    <div className="mt-3">
+                        <p>
+                            Already have an account? <br />
+                            <span>
+                                <Link to="/login">Login</Link>
+                            </span>
+                        </p>
+                    </div>
                 </form>
             </div>
         </div>

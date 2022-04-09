@@ -20,6 +20,8 @@ const Login = () => {
     const [validUsername, setValidUsername] = useState(true);
     const [validPassword, setValidPassword] = useState(true);
 
+    const [formValid, setFormValid] = useState(true);
+
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
 
@@ -76,6 +78,7 @@ const Login = () => {
 
         if (!validUsername || !validPassword) {
             setError("Login failed.");
+            setFormValid(false);
             return;
         }
 
@@ -108,7 +111,7 @@ const Login = () => {
                     <div className="form-group mb-3">
                         <label htmlFor="username">Username</label>
                         <InputField type="text" id="username" value={username} setValue={setUsername} ref={userRef} />
-                        {!validUsername && <div className="username-error">
+                        {!validUsername && !formValid && <div className="username-error">
                             <p>Username must be 3 or more characters</p>
                         </div>}
                     </div>
@@ -117,7 +120,7 @@ const Login = () => {
                         <label htmlFor="password">Password</label>
                         <InputField type="password" id="password" value={password} setValue={setPassword}
                             valid={validPassword} setValid={setValidPassword} ref={passwordRef} />
-                        {!validPassword && <div className="password-error">
+                        {!validPassword && !formValid && <div className="password-error">
                             <p>Password must be 3 or more characters</p>
                         </div>}
                     </div>
