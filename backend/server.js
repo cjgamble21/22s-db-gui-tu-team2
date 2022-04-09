@@ -6,10 +6,11 @@ const cors = require('cors');
 const { log, ExpressAPILogMiddleware } = require('@rama41222/node-logger');
 // const mysqlConnect = require('./db');
 const routes = require('./routes');
+const usersRoutes = require('./routes/users');
 
 // set up some configs for express.
 const config = {
-  name: 'sample-express-app',
+  name: 'vaccine_app',
   port: 8000,
   host: '0.0.0.0',
 };
@@ -29,7 +30,7 @@ app.use(ExpressAPILogMiddleware(logger, { request: true }));
 
 //include routes
 routes(app, logger);
-
+app.use('/users', usersRoutes);
 // connecting the express object to listen on a particular port as defined in the config object.
 app.listen(config.port, config.host, (e) => {
   if (e) {
