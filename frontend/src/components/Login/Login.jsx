@@ -33,16 +33,24 @@ const Login = () => {
     }, []);
 
     // When the username or password fields are updated, remove any error messages
+    // useEffect(() => {
+    //     setValidUsername(true);
+    //     setValidPassword(true);
+    //     setSuccess(false);
+    // }, [username, password])
     useEffect(() => {
+        console.log("Set to true")
         setValidUsername(true);
-        setValidPassword(true);
-        setSuccess(false);
-    }, [username, password])
+    }, [username])
 
+    useEffect(() => {
+        setValidPassword(true);
+    }, [password])
     // Method which facilitates form validation
     const validate = () => {
         if (!USERNAME_REGEX.test(username)) {
             setValidUsername(false);
+            console.log("Set to false")
         }
 
         if (!PASSWORD_REGEX.test(password)) {
@@ -56,6 +64,9 @@ const Login = () => {
         console.log(username, password);
 
         validate();
+
+        console.log(validUsername);
+        console.log(validPassword);
 
         // Obviously, this will be changed to an API call once the backend registration is set up
         if (username === admin.username && password === admin.password) {
