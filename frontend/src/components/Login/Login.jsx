@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import './Login.css';
 import vax from '../../images/Vax.png';
 import InputField from '../InputField';
+import { loginUser } from '../../api/sessionApi';
 
 const Login = () => {
     const USERNAME_REGEX = /^[a-zA-Z0-9_-]{3,}$/;
@@ -71,7 +72,7 @@ const Login = () => {
     }, [username, password])
 
     // Function for handling login form submission
-    const handleSubmit = e => {
+    const handleSubmit = async e => {
         e.preventDefault();
         console.log(username, password);
         console.log(success);
@@ -87,19 +88,41 @@ const Login = () => {
         console.log(validUsername);
         console.log(validPassword);
 
-        // Obviously, this will be changed to an API call once the backend registration is set up
-        if (username === admin.username && password === admin.password) {
-            setAuth({ username, password });
-            setUsername("");
-            setPassword("");
-            setSuccess(true);
-            navigate('/');
-            console.log("Logged in!");
-        } else {
-            console.log("Login unsuccessful!");
-            console.log(error);
-            setError('Login failed.');
+        let user = {
+            username: username,
+            password: password
+        };
+        try {
+            const response = await loginUser(user);
+            // localStorage.setItem("accessToken", response.accessToken);
+            // const token = localStorage.getItem("accessToken");
+            // console.log(token);
+            if (response?.accessToken) {
+                // console.log(token);
+                localStorage.setItem("accessToken", response.accessToken);
+                setAuth({
+                    accessToken: localStorage.getItem("accessToken")
+                });
+            }
+            navigate("/");
+            console.log(response);
+        } catch (err) {
+            console.log(err);
         }
+
+        // Obviously, this will be changed to an API call once the backend registration is set up
+        // if (username === admin.username && password === admin.password) {
+        //     setAuth({ username, password });
+        //     setUsername("");
+        //     setPassword("");
+        //     setSuccess(true);
+        //     navigate('/');
+        //     console.log("Logged in!");
+        // } else {
+        //     console.log("Login unsuccessful!");
+        //     console.log(error);
+        //     setError('Login failed.');
+        // }
     }
 
     return (
