@@ -24,27 +24,14 @@ const Login = () => {
     const [formValid, setFormValid] = useState(true);
 
     const [error, setError] = useState("");
-    const [success, setSuccess] = useState(false);
+    const [success] = useState(false);
 
     const navigate = useNavigate();
-
-    const admin = {
-        username: 'user',
-        password: '1234'
-    }
 
     // On page load, focus the username field
     useEffect(() => {
         userRef.current.focus();
     }, []);
-
-    // When the username or password fields are updated, remove any error messages
-    // useEffect(() => {
-    //     setValidUsername(true);
-    //     setValidPassword(true);
-    //     setSuccess(false);
-    // }, [username, password])
-
 
     // Method which facilitates form validation
     const validate = () => {
@@ -83,31 +70,25 @@ const Login = () => {
             return;
         }
 
-        // validate();
-
-        console.log(validUsername);
-        console.log(validPassword);
-
         let user = {
             username: username,
             password: password
         };
         try {
             const response = await loginUser(user);
-            // localStorage.setItem("accessToken", response.accessToken);
-            // const token = localStorage.getItem("accessToken");
-            // console.log(token);
+
             if (response?.accessToken) {
-                // console.log(token);
                 localStorage.setItem("accessToken", response.accessToken);
+                setUsername("");
+                setPassword("");
                 setAuth({
-                    accessToken: localStorage.getItem("accessToken")
+                    token: response.accessToken
                 });
+                navigate("/");
             }
-            navigate("/");
-            console.log(response);
         } catch (err) {
             console.log(err);
+            setError("Login failed");
         }
 
         // Obviously, this will be changed to an API call once the backend registration is set up
