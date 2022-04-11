@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import './Login.css';
 import vax from '../../images/Vax.png';
 import InputField from '../InputField';
+import { loginUser } from '../../api/sessionApi';
 
 const Login = () => {
     const USERNAME_REGEX = /^[a-zA-Z0-9_-]{3,}$/;
@@ -23,33 +24,19 @@ const Login = () => {
     const [formValid, setFormValid] = useState(true);
 
     const [error, setError] = useState("");
-    const [success, setSuccess] = useState(false);
+    const [success] = useState(false);
 
     const navigate = useNavigate();
-
-    const admin = {
-        username: 'user',
-        password: '1234'
-    }
 
     // On page load, focus the username field
     useEffect(() => {
         userRef.current.focus();
     }, []);
 
-    // When the username or password fields are updated, remove any error messages
-    // useEffect(() => {
-    //     setValidUsername(true);
-    //     setValidPassword(true);
-    //     setSuccess(false);
-    // }, [username, password])
-
-
     // Method which facilitates form validation
     const validate = () => {
         if (!USERNAME_REGEX.test(username)) {
             setValidUsername(false);
-            console.log("Set to false")
         } else {
             setValidUsername(true);
         }
@@ -71,34 +58,36 @@ const Login = () => {
     }, [username, password])
 
     // Function for handling login form submission
-    const handleSubmit = e => {
+    const handleSubmit = async e => {
         e.preventDefault();
         console.log(username, password);
         console.log(success);
 
         if (!validUsername || !validPassword) {
-            setError("Login failed.");
+            setError("Login failed");
             setFormValid(false);
             return;
         }
 
-        // validate();
+        let user = {
+            username: username,
+            password: password
+        };
+        try {
+            const response = await loginUser(user);
 
-        console.log(validUsername);
-        console.log(validPassword);
-
-        // Obviously, this will be changed to an API call once the backend registration is set up
-        if (username === admin.username && password === admin.password) {
-            setAuth({ username, password });
-            setUsername("");
-            setPassword("");
-            setSuccess(true);
-            navigate('/');
-            console.log("Logged in!");
-        } else {
-            console.log("Login unsuccessful!");
-            console.log(error);
-            setError('Login failed.');
+            if (response?.accessToken) {
+                localStorage.setItem("accessToken", response.accessToken);
+                setUsername("");
+                setPassword("");
+                setAuth({
+                    token: response.accessToken
+                });
+                navigate("/");
+            }
+        } catch (err) {
+            console.log(err);
+            setError("Login failed");
         }
     }
 
