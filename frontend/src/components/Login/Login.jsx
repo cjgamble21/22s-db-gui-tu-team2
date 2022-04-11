@@ -37,7 +37,6 @@ const Login = () => {
     const validate = () => {
         if (!USERNAME_REGEX.test(username)) {
             setValidUsername(false);
-            console.log("Set to false")
         } else {
             setValidUsername(true);
         }
@@ -65,7 +64,7 @@ const Login = () => {
         console.log(success);
 
         if (!validUsername || !validPassword) {
-            setError("Login failed.");
+            setError("Login failed");
             setFormValid(false);
             return;
         }
@@ -90,20 +89,6 @@ const Login = () => {
             console.log(err);
             setError("Login failed");
         }
-
-        // Obviously, this will be changed to an API call once the backend registration is set up
-        // if (username === admin.username && password === admin.password) {
-        //     setAuth({ username, password });
-        //     setUsername("");
-        //     setPassword("");
-        //     setSuccess(true);
-        //     navigate('/');
-        //     console.log("Logged in!");
-        // } else {
-        //     console.log("Login unsuccessful!");
-        //     console.log(error);
-        //     setError('Login failed.');
-        // }
     }
 
     return (

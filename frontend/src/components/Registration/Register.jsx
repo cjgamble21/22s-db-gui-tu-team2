@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import './Register.css';
 import vax from '../../images/Vax.png';
 import InputField from '../InputField';
+import { registerUser, loginUser } from '../../api/sessionApi';
 
 
 const Register = () => {
@@ -27,7 +28,7 @@ const Register = () => {
     const [formValid, setFormValid] = useState(true);
 
     const [error, setError] = useState("");
-    const [success, setSuccess] = useState(false);
+    const [success] = useState(false);
 
     const navigate = useNavigate();
 
@@ -68,24 +69,60 @@ const Register = () => {
     }, [username, password, passwordConfirmation])
 
 
-    const handleSubmit = e => {
+    const handleSubmit = async e => {
         e.preventDefault();
 
         if (!validUsername || !validPassword || !passwordsMatch) {
-            setError("Registration failed.");
+            setError("Registration failed");
             setFormValid(false);
             return;
         }
 
-        if (validUsername && validPassword && passwordsMatch) {
-            console.log("Success!");
-            setSuccess(true);
-            setAuth({ username, password });
-            navigate('/');
-        } else {
-            console.log("Failure");
-            setError('Registration failed.');
+        let user = {
+            username: username,
+            password: password
         }
+
+        try {
+            const response = await registerUser(user);
+
+            if (response === 200) {
+                try {
+                    const res = await loginUser(user);
+                    console.log(res);
+                    if (res?.accessToken) {
+                        localStorage.setItem("accessToken", response.accessToken);
+                        setUsername("");
+                        setPassword("");
+                        setPasswordConfirmation("");
+                        setAuth({
+                            token: res.accessToken
+                        })
+                        navigate("/");
+                    }
+                } catch (err) {
+                    console.log(err);
+                }
+            } else {
+                setError("Registration failed");
+            }
+
+        } catch (err) {
+            console.log(err);
+            setError("Registration failed");
+        }
+
+
+
+        // if (validUsername && validPassword && passwordsMatch) {
+        //     console.log("Success!");
+        //     setSuccess(true);
+        //     setAuth({ username, password });
+        //     navigate('/');
+        // } else {
+        //     console.log("Failure");
+        //     setError('Registration failed.');
+        // }
     }
 
     return (
