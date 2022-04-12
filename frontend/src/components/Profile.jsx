@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { Modal, Button } from 'react-bootstrap';
 import { StaticProfileInfo, DynamicProfileInfo } from './ProfileInfo';
 import { ProfileVaccineList } from './ProfileVaccineList';
+import { useNavigate } from 'react-router-dom';
 
 
 const Profile = () => {
@@ -13,6 +14,13 @@ const Profile = () => {
     // const username = jwt(auth.token).username;
     let username = null;
     // console.log(username);
+
+    const navigate = useNavigate();
+
+    const logout = () => {
+        localStorage.clear();
+        navigate('/login');
+    }
 
     // Modal methods
     const handleShow = () => setModal(true);
@@ -30,6 +38,11 @@ const Profile = () => {
             name: 'Swine flu',
             issuer: 'Pfizer',
             days_passed: 130
+        },
+        {
+            name: 'Tetanus',
+            issuer: 'J&J',
+            days_passed: 202
         }
     ]
 
@@ -66,6 +79,9 @@ const Profile = () => {
                             <p className='text-muted mb-1'>{user.username}</p>
                             <p className='text-muted mb-1'>{user.email}</p>
                             <p className='mb-4 fw-bold'>{user.organization}</p>
+                            <Button variant="primary" className='mb-4' onClick={logout}>
+                                Logout
+                            </Button>
                         </div>
                     </div>
                     <div className='card mb-4 mb-lg-0'>
