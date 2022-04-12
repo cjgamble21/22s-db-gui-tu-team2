@@ -59,8 +59,6 @@ const Login = () => {
     // Function for handling login form submission
     const handleSubmit = async e => {
         e.preventDefault();
-        console.log(username, password);
-        console.log(success);
 
         if (!validUsername || !validPassword) {
             setError("Login failed");
@@ -75,7 +73,7 @@ const Login = () => {
         try {
             const response = await loginUser(user);
 
-            if (response?.accessToken) {
+            if (response.accessToken) {
                 localStorage.setItem("accessToken", response.accessToken);
                 setUsername("");
                 setPassword("");
@@ -83,6 +81,8 @@ const Login = () => {
                     token: response.accessToken
                 });
                 navigate("/");
+            } else {
+                setError("Login failed");
             }
         } catch (err) {
             console.log(err);
