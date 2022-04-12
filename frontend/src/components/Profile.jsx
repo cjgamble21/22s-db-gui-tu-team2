@@ -3,6 +3,7 @@ import jwt from 'jwt-decode';
 import { useAuth } from '../hooks/useAuth';
 import { Modal, Button } from 'react-bootstrap';
 import { StaticProfileInfo, DynamicProfileInfo } from './ProfileInfo';
+import { ProfileVaccineList } from './ProfileVaccineList';
 
 
 const Profile = () => {
@@ -16,6 +17,8 @@ const Profile = () => {
     // Modal methods
     const handleShow = () => setModal(true);
     const handleHide = () => setModal(false);
+
+    const addVaccine = vaccine => vaccines.push(vaccine);
 
     const vaccines = [
         {
@@ -70,13 +73,7 @@ const Profile = () => {
                             Vaccine List
                         </div>
                         <div className='card-body p-0'>
-                            <ul className='list-group list-group-flush rounded-3'>
-                                {vaccines.map((vaccine, index) =>
-                                    <li key={index} className="list-group-item justify-content-left align-items-center p-3">
-                                        {vaccine.name}: {vaccine.days_passed} days since last dose
-                                    </li>
-                                )}
-                            </ul>
+                            <ProfileVaccineList vaccines={vaccines} addVaccine={addVaccine} />
                         </div>
                     </div>
                 </div>
@@ -88,7 +85,7 @@ const Profile = () => {
                         </div>
                         <div className='card-body'>
                             <StaticProfileInfo firstName={user.first_name} lastName={user.last_name}
-                                age={user.age} email={user.email} username={user.username} />
+                                age={user.age} email={user.email} username={user.username} organization={user.organization} />
                             <hr />
                             <div className='row'>
                                 <div className='col-sm-10'>
