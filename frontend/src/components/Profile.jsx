@@ -29,7 +29,8 @@ const Profile = () => {
         username: 'cjgamble21',
         first_name: 'Connor',
         last_name: 'Gamble',
-        email: 'cjgamble21@gmail.com'
+        email: 'cjgamble21@gmail.com',
+        age: 21
     }
 
     return (
@@ -56,16 +57,67 @@ const Profile = () => {
                             <p className='text-muted mb-4'>{user.email}</p>
                         </div>
                     </div>
+                    <div className='card mb-4 mb-lg-0'>
+                        <div className='card-header'>
+                            Vaccine List
+                        </div>
+                        <div className='card-body p-0'>
+                            <ul className='list-group list-group-flush rounded-3'>
+                                {vaccines.map((vaccine, index) =>
+                                    <li key={index} className="list-group-item justify-content-left align-items-center p-3">
+                                        {vaccine.name}: {vaccine.days_passed} days since last dose
+                                    </li>
+                                )}
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-                <div className='card mb-4 mb-lg-0'>
-                    <div className='card-body p-0'>
-                        <ul className='list-group list-group-flush rounded-3'>
 
-                        </ul>
+                <div className="col-lg-8">
+                    <div className='card mb-4'>
+                        <div className='card-header'>
+                            <h5>User Information</h5>
+                        </div>
+                        <div className='card-body'>
+                            <div className='row'>
+                                <div className='col-sm-3'>
+                                    <h6 className='mb-0'>Name</h6>
+                                </div>
+                                <div className='col-sm-9'>
+                                    <p className='mb-0 text-muted'>{user.first_name} {user.last_name}</p>
+                                </div>
+                            </div>
+                            <hr />
+                            <div className='row'>
+                                <div className='col-sm-3'>
+                                    <h6 className='mb-0'>Email</h6>
+                                </div>
+                                <div className='col-sm-9'>
+                                    <p className='mb-0 text-muted'>{user.email}</p>
+                                </div>
+                            </div>
+                            <hr />
+                            <div className='row'>
+                                <div className='col-sm-3'>
+                                    <h6 className='mb-0'>Username</h6>
+                                </div>
+                                <div className='col-sm-9'>
+                                    <p className='mb-0 text-muted'>{user.username}</p>
+                                </div>
+                            </div>
+                            <hr />
+                            <div className='row'>
+                                <div className='col-sm-3'>
+                                    <h6 className='mb-0'>Age</h6>
+                                </div>
+                                <div className='col-sm-9'>
+                                    <p className='mb-0 text-muted'>{user.age}</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-
         </div>
     )
 }
