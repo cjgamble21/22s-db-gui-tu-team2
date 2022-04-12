@@ -1,8 +1,7 @@
 import './App.css';
 import Login from './components/Login/Login'
 import Register from './components/Registration/Register'
-import Home from './components/Home'
-import axios from 'axios';
+import Profile from './components/Profile'
 import { Outlet, Routes, Route } from 'react-router-dom';
 import { RequireAuth } from './RequireAuth';
 
@@ -22,7 +21,7 @@ const App = () => {
 
           {/* Protected routes */}
           <Route element={<RequireAuth />}>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Profile />} />
           </Route>
 
           {/* Public routes */}

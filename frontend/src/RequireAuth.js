@@ -5,11 +5,8 @@ The plan here is to send user to a page they attempted to access after logging i
 */
 
 import { useLocation, Navigate, Outlet } from "react-router-dom";
-import useAuth from "./hooks/useAuth";
 
 export const RequireAuth = () => {
-    const { auth } = useAuth();
-
     const location = useLocation();
 
     const token = localStorage.getItem("accessToken");

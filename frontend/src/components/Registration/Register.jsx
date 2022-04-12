@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useContext } from 'react';
-import useAuth from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
 import './Register.css';
 import vax from '../../images/Vax.png';
