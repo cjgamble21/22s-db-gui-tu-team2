@@ -24,6 +24,10 @@ alter table user
 ADD column age VARCHAR(3);
 alter table user
 ADD COLUMN email VARCHAR(20) UNIQUE ;
+alter table user
+MODIFY first_name VARCHAR(15);
+alter table user
+MODIFY last_name VARCHAR(25);
 
 create table side_affects(
     vacc_name VARCHAR(25) NOT NULL ,

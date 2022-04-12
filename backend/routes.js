@@ -207,6 +207,7 @@ module.exports = function routes(app, logger) {
     
     const { token } = req.body;
     refreshTokens = refreshTokens.filter(t => t !== token);
+    
 
     res.send("Logout successful");
 });
