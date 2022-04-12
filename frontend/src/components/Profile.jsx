@@ -35,7 +35,7 @@ const Profile = () => {
             days_passed: 20
         },
         {
-            name: 'Swine flu',
+            name: 'Measles',
             issuer: 'Pfizer',
             days_passed: 130
         },
