@@ -13,8 +13,7 @@ const Register = () => {
 
     const { setAuth } = useAuth();
     const userRef = useRef();
-    const passRef = useRef();
-    const confRef = useRef();
+
     const firstRender = useRef(true);
 
     const [username, setUsername] = useState("");
@@ -141,7 +140,7 @@ const Register = () => {
 
                     <div className="form-group mb-3">
                         <label htmlFor="password">Password</label>
-                        <InputField type="password" id="password" value={password} setValue={setPassword} ref={passRef} />
+                        <InputField type="password" id="password" value={password} setValue={setPassword} />
                         {!validPassword && !formValid && <div className="password-error">
                             <p>Password must be 3 or more characters</p>
                         </div>}
@@ -149,7 +148,7 @@ const Register = () => {
 
                     <div className="form-group mb-3">
                         <label htmlFor="confirmation">Confirm Password</label>
-                        <InputField type="password" id="confirmation" value={passwordConfirmation} setValue={setPasswordConfirmation} ref={confRef} />
+                        <InputField type="password" id="confirmation" value={passwordConfirmation} setValue={setPasswordConfirmation} />
                     </div>
                     {!passwordsMatch && !formValid && <div className="confirmation-error">
                         <p>Passwords must match</p>

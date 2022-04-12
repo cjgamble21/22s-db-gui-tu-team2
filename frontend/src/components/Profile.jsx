@@ -42,7 +42,7 @@ const Profile = () => {
         {
             name: 'Tetanus',
             issuer: 'J&J',
-            days_passed: 202
+            days_passed: 365
         }
     ]
 

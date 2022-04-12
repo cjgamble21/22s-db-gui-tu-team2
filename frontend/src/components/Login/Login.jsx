@@ -12,7 +12,6 @@ const Login = () => {
 
     const { setAuth } = useAuth();
     const userRef = useRef();
-    const passwordRef = useRef();
     const firstRender = useRef(true);
 
     const [username, setUsername] = useState("");
@@ -108,7 +107,7 @@ const Login = () => {
                     <div className="form-group mb-3">
                         <label htmlFor="password">Password</label>
                         <InputField type="password" id="password" value={password} setValue={setPassword}
-                            valid={validPassword} setValid={setValidPassword} ref={passwordRef} />
+                            valid={validPassword} setValid={setValidPassword} />
                         {!validPassword && !formValid && <div className="password-error">
                             <p>Password must be 3 or more characters</p>
                         </div>}
