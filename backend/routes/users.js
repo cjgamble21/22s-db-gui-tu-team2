@@ -60,6 +60,33 @@ router.post('/', (req, res) => {
       }
     });
   });
+   //delete vaccine from record
+  router.delete('/:id', (req,res) =>{
+    const id = req.params.id;
+    const name = req.body.name;
+    const manu = req.body.manufacturer;
+    pool.getConnection(function (err, connection){
+      if(err){
+        // if there is an issue obtaining a connection, release the connection instance and log the error
+        logger.error('Problem obtaining MySQL connection',err)
+        res.status(400).send('Problem obtaining MySQL connection'); 
+      } else {
+        // if there is no issue obtaining a connection, execute query and release connection
+        connection.query('DELETE from vaccine_user WHERE username = ? AND name = ? AND manufacturer = ?',[id, name, manu] , function (err, rows, fields) {
+          connection.release();
+          if (err) {
+            logger.error("Error while fetching values: \n", err);
+            res.status(400).json({
+              "data": [],
+              "error": "Error obtaining values"
+            })
+          } else {
+            res.status(200).send(`Deleted ${name}  from user ${id}`);
+          }
+        });
+      }
+    });
+  });
 
 
   router.get('/:id/viewers', (req, res) => {
@@ -146,4 +173,29 @@ router.post('/', (req, res) => {
       }
     });
   });
-  module.exports = router;
+
+  router.put('/:id', (req, res) =>{
+    const id = req.params.id; 
+    pool.getConnection(function (err, connection){
+      if(err){
+        // if there is an issue obtaining a connection, release the connection instance and log the error
+        logger.error('Problem obtaining MySQL connection',err)
+        res.status(400).send('Problem obtaining MySQL connection'); 
+      } else {
+        // if there is no issue obtaining a connection, execute query and release connection
+        connection.query('Update user SET first_name = IFNULL(?, first_name), last_name = IFNULL(?, last_name), age = IFNULL(?, age),email = IFNULL(?, email) WHERE ID = ?',[req.body.first_name, req.body.last_name, req.body.age, req.body.email,id], function (err, rows, fields) {
+          connection.release();
+          if (err) {
+            // if there is an error with the query, log the error
+            logger.error("Problem updating the table: \n", err);
+            res.status(400).send('Problem updating the table:'); 
+          } else {
+            res.status(200).json({
+                "data":rows
+            });
+          }
+        });
+      }
+    });
+  });
+ module.exports = router;
