@@ -22,6 +22,33 @@ const authenticateJWT = (req, res, next) => {
       res.sendStatus(401);
   }
 };
+
+router.post('/:id/dose', (req, res) => {
+  console.log(req.body);
+  const payload = req.body;
+  const id = req.params.id;
+  console.log(payload);
+  // obtain a connection from our pool of connections
+  pool.getConnection(function (err, connection){
+    if(err){
+      // if there is an issue obtaining a connection, release the connection instance and log the error
+      logger.error('Problem obtaining MySQL connection',err)
+      res.status(400).send('Problem obtaining MySQL connection'); 
+    } else {
+      // if there is no issue obtaining a connection, execute query and release connection
+      connection.query('INSERT INTO vaccine_user (`username`,`name`,`manufacturer`,`date`,`private`,`image`) VALUES(?,?,?,?,?,?)',[id,payload.name,payload.manufacturer,payload.date,payload.private,payload.image], function (err, rows, fields) {
+        connection.release();
+        if (err) {
+          // if there is an error with the query, log the error
+          logger.error("Problem inserting into test table: \n", err);
+          res.status(400).send('Problem inserting into table'); 
+        } else {
+          res.status(200).send(`added ${payload.name} as a vaccine for ${id}`);
+        }
+      });
+    }
+  });
+});
 //default route
 router.post('/', (req, res) => {
     const payload = req.body;
