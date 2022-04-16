@@ -158,8 +158,8 @@ module.exports = function routes(app, logger) {
   });
 
   //authenticate user
-  app.post('/session',  async (req, res) => {
-    console.log(req.body);
+  app.post('/session', (req, res) => {
+    
     const payload = req.body;
     const password = payload.password;
     // obtain a connection from our pool of connections
@@ -170,22 +170,22 @@ module.exports = function routes(app, logger) {
         res.status(400).send('Problem obtaining MySQL connection'); 
       } else {
         // if there is no issue obtaining a connection, execute query and release connection
-        connection.query('Select * from user WHERE email = ? OR username = ? ',[payload.email, payload.username], (err, rows, fields) => {
+        connection.query('SELECT * FROM user WHERE username = ?',[payload.username], function (err, rows, fields){
+          connection.release();
           
           const user = rows[0];
+          // console.log(user);
+          
           const validPassword = bcrypt.compareSync(password, user.password);
           
           console.log(validPassword);
-          
-
-          
           if (err) {
             // if there is an error with the query, log the error
             logger.error("Problem inserting into test table: \n", err);
             res.status(400).send('Problem inserting into table'); 
           } else {
             if (validPassword){
-              const accessToken = jwt.sign({ username: user.username}, accessTokenSecret, { expiresIn: '1m' });
+              const accessToken = jwt.sign({ username: user.username}, accessTokenSecret);
               const refreshToken = jwt.sign({ username: user.username}, refreshTokenSecret);
 
               refreshTokens.push(refreshToken);
@@ -199,10 +199,12 @@ module.exports = function routes(app, logger) {
             }
           }
         });
-        connection.release();
+        
       }
     });
   });
+
+
   app.post('/logout', (req, res) => {
     
     const { token } = req.body;
@@ -215,51 +217,6 @@ module.exports = function routes(app, logger) {
 
 
   //get vaccines info
-  app.get('/vaccine', (req, res) => {
-    // obtain a connection from our pool of connections
-    pool.getConnection(function (err, connection){
-      if(err){
-        // if there is an issue obtaining a connection, release the connection instance and log the error
-        logger.error('Problem obtaining MySQL connection',err)
-        res.status(400).send('Problem obtaining MySQL connection'); 
-      } else {
-        // if there is no issue obtaining a connection, execute query and release connection
-        const vacc_name = req.query.name
-        const vacc_man = req.query.manufacturer 
-        if(vacc_name && vacc_man){
-          connection.query('SELECT * FROM `vaccine_app`.`vaccine` WHERE name = ? AND manufacturer = ?', [vacc_name,vacc_man], function (err, rows, fields) {
-            connection.release();
-            if (err) {
-              logger.error("Error while fetching values: \n", err);
-              res.status(400).json({
-                "data": [],
-                "error": "Error obtaining values"
-              })
-            } else {
-              res.status(200).json({
-                "data": rows
-              });
-            }
-          });
-        }else{
-          connection.query('SELECT * FROM `vaccine_app`.`vaccine`', function (err, rows, fields) {
-            connection.release();
-            if (err) {
-              logger.error("Error while fetching values: \n", err);
-              res.status(400).json({
-                "data": [],
-                "error": "Error obtaining values"
-              })
-            } else {
-              res.status(200).json({
-                "data": rows
-              });
-            }
-          });
-        }
-      }
-    });
-  });
   //get vaccine side effects route
   app.get('/side-affects', (req, res) => {
     // obtain a connection from our pool of connections
@@ -380,36 +337,4 @@ module.exports = function routes(app, logger) {
         });
     });
 });
-
-  //delete vaccine from record
-  app.delete('/users/:id', (req,res) =>{
-    const id = req.params.id;
-    const name = req.body.name;
-    const manu = req.body.manufacturer;
-    pool.getConnection(function (err, connection){
-      if(err){
-        // if there is an issue obtaining a connection, release the connection instance and log the error
-        logger.error('Problem obtaining MySQL connection',err)
-        res.status(400).send('Problem obtaining MySQL connection'); 
-      } else {
-        // if there is no issue obtaining a connection, execute query and release connection
-        connection.query('DELETE from vaccine_user WHERE username = ? AND name = ? AND manufacturer = ?',[id, name, manu] , function (err, rows, fields) {
-          connection.release();
-          if (err) {
-            logger.error("Error while fetching values: \n", err);
-            res.status(400).json({
-              "data": [],
-              "error": "Error obtaining values"
-            })
-          } else {
-            res.status(200).send(`Deleted ${name}  from user ${id}`);
-          }
-        });
-      }
-    });
-  });
-
-
-
-
 }

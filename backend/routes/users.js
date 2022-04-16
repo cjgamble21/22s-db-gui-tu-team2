@@ -2,7 +2,26 @@ const bcrypt = require('bcryptjs');
 const pool = require('../db');
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
+const accessTokenSecret = 'youraccesstokensecret';
+const authenticateJWT = (req, res, next) => {
+  const authHeader = req.headers.authorization;
 
+  if (authHeader) {
+      const token = authHeader.split(' ')[1];
+
+      jwt.verify(token, accessTokenSecret, (err, user) => {
+          if (err) {
+              return res.sendStatus(403);
+          }
+
+          req.user = user;
+          next();
+      });
+  } else {
+      res.sendStatus(401);
+  }
+};
 //default route
 router.post('/', (req, res) => {
     const payload = req.body;
@@ -26,7 +45,7 @@ router.post('/', (req, res) => {
             logger.error("Problem inserting into test table: \n", err);
             res.status(400).send('Problem inserting into table'); 
           } else {
-            res.status(200).send(`added ${req.body.first_name} ${payload.last_name} to the table!`);
+            res.status(200).send(rows);
           }
         });
       }
@@ -174,8 +193,9 @@ router.post('/', (req, res) => {
     });
   });
 
-  router.put('/:id', (req, res) =>{
+  router.put('/:id',authenticateJWT, (req, res) =>{
     const id = req.params.id; 
+    console.log(req.body);
     pool.getConnection(function (err, connection){
       if(err){
         // if there is an issue obtaining a connection, release the connection instance and log the error
