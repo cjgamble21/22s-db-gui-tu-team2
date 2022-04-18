@@ -51,33 +51,74 @@ router.post('/:id/dose', (req, res) => {
 });
 //default route
 router.post('/', (req, res) => {
-    const payload = req.body;
-    const password = payload.password;
-    const salt = bcrypt.genSaltSync(10);
-    const hashword = bcrypt.hashSync(password, 10);
+  const payload = req.body;
+  const password = payload.password;
+  const salt = bcrypt.genSaltSync(10);
+  const hashword = bcrypt.hashSync(password, 10);
+  
+  console.log(payload);
+  // obtain a connection from our pool of connections
+  pool.getConnection(function (err, connection){
+    if(err){
+      // if there is an issue obtaining a connection, release the connection instance and log the error
+      logger.error('Problem obtaining MySQL connection',err)
+      res.status(400).send('Problem obtaining MySQL connection'); 
+    } else {
+        if (!payload.admin){
+           // if there is no issue obtaining a connection, execute query and release connection
+      connection.query('INSERT INTO user (`first_name`,`last_name`,`age`,`username`,`password`,`email`) VALUES(?,?,?,?,?,?)',[payload.first_name,payload.last_name,payload.age,payload.username,hashword,payload.email], function (err, rows, fields) {
+        connection.release();
+        if (err) {
+          // if there is an error with the query, log the error
+          logger.error("Problem inserting into test table: \n", err);
+          res.status(400).send('Problem inserting into table'); 
+        } else {
+          res.status(200).send(`added ${req.body.first_name} ${payload.last_name} to the table!`);
+        }
+      });
+
+        }
+        else{
+      
+      connection.query('INSERT INTO user (`first_name`,`last_name`,`age`,`username`,`password`,`email`,`admin`) VALUES(?,?,?,?,?,?,?)',[payload.first_name,payload.last_name,payload.age,payload.username,hashword,payload.email,payload.admin], function (err, rows, fields) {
+        // connection.release();
+        if (err) {
+          // if there is an error with the query, log the error
+          logger.error("Problem inserting into test table: \n", err);
+          res.status(400).send('Problem inserting into table'); 
+         } else {
+          connection.query('INSERT INTO `vaccine_app`.`institution`VALUES(?,?,?,?,?)',[payload.institution_name,payload.institution_address,payload.institution_type,payload.institution_description,payload.email],function (err, rows, fields){
+            connection.release();
+            if (err) {
+              // if there is an error with the query, log the error
+              logger.error("Problem inserting into institution table: \n", err);
+              res.status(400).send('Problem creating institution'); 
+            } else {
+              res.status(200).send(`added ${payload.institution_name} with admin: ${payload.email} to the table!`);
+            } 
+            
+          });
+          
+        }
+      });
+      // connection.query('INSERT INTO `vaccine_app`.`institution`VALUES(?,?,?,?,?)',[payload.institution_name,payload.institution_address,payload.institution_type,payload.institution_description,payload.email],function (err, rows, fields){
+      //   connection.release();
+      //   if (err) {
+      //     // if there is an error with the query, log the error
+      //     logger.error("Problem inserting into institution table: \n", err);
+      //     res.status(400).send('Problem creating institution'); 
+      //   } else {
+      //     res.status(200).send(`added ${payload.institution_name} with admin: ${payload.email} to the table!`);
+      //   } 
+        
+      // });
+      
+    }
     
-    console.log(payload);
-    // obtain a connection from our pool of connections
-    pool.getConnection(function (err, connection){
-      if(err){
-        // if there is an issue obtaining a connection, release the connection instance and log the error
-        logger.error('Problem obtaining MySQL connection',err)
-        res.status(400).send('Problem obtaining MySQL connection'); 
-      } else {
-        // if there is no issue obtaining a connection, execute query and release connection
-        connection.query('INSERT INTO user (`first_name`,`last_name`,`age`,`username`,`password`,`email`) VALUES(?,?,?,?,?,?)',[payload.first_name,payload.last_name,payload.age,payload.username,hashword,payload.email], function (err, rows, fields) {
-          connection.release();
-          if (err) {
-            // if there is an error with the query, log the error
-            logger.error("Problem inserting into test table: \n", err);
-            res.status(400).send('Problem inserting into table'); 
-          } else {
-            res.status(200).send(rows);
-          }
-        });
-      }
-    });
+  }
+
   });
+});
 
 
   router.post('/:id/viewers', (req, res) => {
