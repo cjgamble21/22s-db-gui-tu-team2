@@ -3,24 +3,17 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const accessTokenSecret = 'youraccesstokensecret';
-const authenticateJWT = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
-  if (authHeader) {
-      const token = authHeader.split(' ')[1];
-
-      jwt.verify(token, accessTokenSecret, (err, user) => {
-          if (err) {
-              return res.sendStatus(403);
-          }
-
-          req.user = user;
-          next();
-      });
-  } else {
-      res.sendStatus(401);
-  }
-};
+//authenticate jwt
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (token == null) return res.sendStatus(401);
+  jwt.verify(token, accessTokenSecret, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+}
 
 
 router.post('/', (req, res) =>{
