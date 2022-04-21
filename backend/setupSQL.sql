@@ -11,6 +11,9 @@ CREATE INDEX vaccine_key ON vaccine(name,manufacturer);
 ALTER TABLE vaccine
 ADD column time_valid INT;
 
+
+
+Create index user_index ON user(email);
 create table user(
     first_name VARCHAR(15) NOT NULL,
     last_name VARCHAR(25) NOT NULL,
@@ -82,3 +85,13 @@ insert into side_affects(vacc_name, vacc_manu, side_affect) VALUES
 
 insert into viewer(record_holder, viewer, relationship) VALUES
 ('fordj626','chefcurry','Manager at work');
+
+
+create table requirement(
+    inst_name VARCHAR(25),
+    inst_add VARCHAR(50),
+    vacc_name VARCHAR(25),
+    vacc_manu VARCHAR(25),
+    FOREIGN KEY (inst_name, inst_add) REFERENCES institution(name, address),
+    FOREIGN KEY (vacc_name, vacc_manu) REFERENCES vaccine(name, manufacturer)
+);

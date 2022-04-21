@@ -3,6 +3,7 @@ const pool = require('../db');
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+const jsondiff = require('json-diff');
 const accessTokenSecret = 'youraccesstokensecret';
 const authenticateJWT = (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -22,6 +23,34 @@ const authenticateJWT = (req, res, next) => {
       res.sendStatus(401);
   }
 };
+
+const get_admins = (viewers, next) => {
+  console.log(viewers);
+  const admins = viewers.filter(admin => admin.admin === 1);
+  
+  // console.log(admins);
+  return admins; 
+
+};
+
+const get_emails = (admins, next) => {
+  const emails = admins.map(admin => admin.viewer);
+  // console.log(emails);
+  return emails;
+}
+
+
+const get_adds = (insts, next) => {
+  const adds = insts.map(inst => inst.address);
+  // console.log(adds);
+  return adds;
+}
+
+const get_inst_names = (insts, next) => { 
+  const inst_names = insts.map(inst => inst.name);
+  // console.log(inst_names);
+  return inst_names;
+}
 
 router.post('/:id/dose', (req, res) => {
   console.log(req.body);
@@ -286,4 +315,105 @@ router.post('/', (req, res) => {
       }
     });
   });
+
+  // router.get('/:username/requirements', (req, res) => {
+  //   const username = req.params.username;
+  //   console.log(req.body);
+  //   pool.getConnection(function (err, connection){
+  //     if(err){
+  //       // if there is an issue obtaining a connection, release the connection instance and log the error
+  //       logger.error('Problem obtaining MySQL connection',err)
+  //       res.status(400).send('Problem obtaining MySQL connection'); 
+  //     } else {
+  //       // if there is no issue obtaining a connection, execute query and release connection
+  //       connection.query('SELECT name, manufacturer FROM `vaccine_app`.`vaccine_user` WHERE username = ?',[username], function (err, rows, fields) {
+  //         if (err) {
+  //           // if there is an error with the query, log the error
+  //           logger.error("Problem updating the table: \n", err);
+  //           res.status(400).send('Problem updating the table:'); 
+  //         } else {
+  //           curr_vacc = rows;
+  //           connection.query('SELECT viewer, admin  FROM viewer JOIN user t on t.email = viewer.viewer WHERE record_holder = ?',[username], function (err, rows, fields) {
+  //             connection.release();
+  //           if (err) {
+  //             // if there is an error with the query, log the error
+  //             logger.error("Problem getting vieweres: \n", err);
+  //             res.status(400).send('Problem getting viewers:'); 
+  //           } else {
+  //             const admins = get_admins(rows);
+  //             const ad=JSON.parse(JSON.stringify(admins));
+              
+  //             const em = get_emails(ad);
+  //             connection.query('SELECT name, address from institution where admin_email IN (?)',[em], function (err, rows, fields) {
+  //               if (err) {
+  //                 // if there is an error with the query, log the error
+  //                 logger.error("Problem getting institutions: \n", err);
+  //                 res.status(400).send('Problem getting institutions:');
+  //               } else {
+  //                 const inst = JSON.parse(JSON.stringify(rows));
+  //                 // console.log(inst);
+  //                 //get requirements for institutions
+  //                 connection.query('SELECT vacc_manu, vacc_name FROM requirement WHERE inst_add IN (?) AND inst_name IN (?)',[get_adds(inst), get_inst_names(inst)], function (err, rows, fields) {
+  //                   if (err){
+  //                     // if there is an error with the query, log the error
+  //                     logger.error("Problem getting requirements: \n", err);
+  //                     res.status(400).send('Problem getting requirements:');
+  //                   } else{
+                      
+  //                     const reqs = JSON.parse(JSON.stringify(rows));
+
+  //                     const remaining = jsondiff.diff(curr_vacc, reqs, {full:1});
+  //                     console.log(remaining); 
+  //                     res.status(200).json({
+  //                       "reqs":remaining
+        
+  //                   });
+  //                   }
+  //                 });
+                  
+  //               }
+
+                
+  //             });
+              
+
+  //           }
+  //         });
+
+            
+  //         }
+  //       });
+  //     }
+  //   });
+  // });
+
+
+  //get for reqs
+  router.get('/:username/requirements', (req, res) => {
+    const username = req.params.username;
+    pool.getConnection(function (err, connection){
+      if(err){
+        // if there is an issue obtaining a connection, release the connection instance and log the error
+        logger.error('Problem obtaining MySQL connection',err)
+        res.status(400).send('Problem obtaining MySQL connection'); 
+      } else {
+        // if there is no issue obtaining a connection, execute query and release connection
+        connection.query('SELECT vacc_manu, vacc_name FROM requirement WHERE inst_add IN (SELECT address from institution where admin_email IN ((SELECT viewer FROM viewer JOIN user t on t.email = viewer.viewer WHERE record_holder = ? AND admin = 1))) AND inst_name IN (SELECT name from institution where admin_email IN ((SELECT viewer FROM viewer JOIN user t on t.email = viewer.viewer WHERE record_holder = ? AND admin = 1))) AND vacc_name NOT IN (SELECT name FROM `vaccine_app`.`vaccine_user` WHERE username = ?)',[username, username, username], function (err, rows, fields) {
+          connection.release();
+          if (err) {
+            // if there is an error with the query, log the error
+            logger.error("Problem getting requirements: \n", err);
+            res.status(400).send('Problem getting requirements:'); 
+          } else {
+            res.status(200).json({
+                "data":rows
+            });
+          }
+        });
+      }
+    });
+  
+  });
  module.exports = router;
+
+ 
