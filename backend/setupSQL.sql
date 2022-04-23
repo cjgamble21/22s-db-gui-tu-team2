@@ -95,3 +95,13 @@ create table requirement(
     FOREIGN KEY (inst_name, inst_add) REFERENCES institution(name, address),
     FOREIGN KEY (vacc_name, vacc_manu) REFERENCES vaccine(name, manufacturer)
 );
+
+
+insert into vaccine(name, number_doses, manufacturer)
+VALUES ('HPV vaccine', '1', 'Gardasil');
+
+insert into vaccine_user(username, manufacturer, name, date)
+VALUES ('DoraN', 'Gardasil', 'HPV vaccine', '2005-10-10');
+
+insert into viewer(record_holder, viewer, relationship) VALUES
+('fordj626','KD@kyrieabitch.com','Manager at work');

@@ -160,7 +160,7 @@ module.exports = function routes(app, logger) {
             res.status(400).send('Problem inserting into table'); 
           } else {
             if (validPassword){
-              const accessToken = jwt.sign({ username: user.username}, accessTokenSecret);
+              const accessToken = jwt.sign({username: user.username, admin:user.admin, email:user.email}, accessTokenSecret);
               const refreshToken = jwt.sign({ username: user.username}, refreshTokenSecret);
 
               refreshTokens.push(refreshToken);

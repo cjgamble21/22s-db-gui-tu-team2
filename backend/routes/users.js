@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+var async = require("async");
 const pool = require('../db');
 const express = require('express');
 const router = express.Router();
@@ -23,6 +24,46 @@ const authenticateJWT = (req, res, next) => {
       res.sendStatus(401);
   }
 };
+
+const ret = (data, res) => {
+  res.status(201).json({"data":data});
+}
+
+const parsejwt = (token, next) => {
+  const res = jwt.decode(token);
+  return res;
+};
+
+const get_bad_users = (members,email, connection, res) => { 
+  let missing = [];
+  console.log('startquery\n');
+  async.forEachOf(members, (member, key, callback) => {
+    connection.query('SELECT DISTINCT vacc_name FROM (select vacc_name from requirement where inst_name = (SELECT name FROM institution WHERE admin_email = ?))t LEFT JOIN (select name from vaccine_user where username = ?)k ON t.vacc_name = k.name WHERE k.name IS NULL', [email, member.username], function (err, rows, fields) {
+      if (err) {
+        console.log('error\n');
+        console.log(err);
+        callback(err);
+      }
+      else {
+        if (rows.length > 0) {
+          missing.push(member);
+          console.log(member);
+          callback(null);
+        }
+      }
+
+      });
+    
+    });
+    return missing;
+
+
+
+
+
+
+ }
+
 
 const get_admins = (viewers, next) => {
   console.log(viewers);
@@ -51,7 +92,6 @@ const get_inst_names = (insts, next) => {
   // console.log(inst_names);
   return inst_names;
 }
-
 router.post('/:id/dose', (req, res) => {
   console.log(req.body);
   const payload = req.body;
@@ -414,6 +454,133 @@ router.post('/', (req, res) => {
     });
   
   });
+
+
+  router.get('/:username/requirements/:institution_name/', (req, res) => {
+    const username = req.params.username;
+    const name = req.params.institution_name;
+    console.log(name);
+    pool.getConnection(function (err, connection){
+      if(err){
+        // if there is an issue obtaining a connection, release the connection instance and log the error
+        logger.error('Problem obtaining MySQL connection',err)
+        res.status(400).send('Problem obtaining MySQL connection'); 
+      } else {
+        // if there is no issue obtaining a connection, execute query and release connection
+        connection.query('SELECT vacc_manu, vacc_name FROM requirement WHERE inst_name = ? AND vacc_name NOT IN (SELECT name FROM `vaccine_app`.`vaccine_user` WHERE username = ?)',[name, username], function (err, rows, fields) {
+          connection.release();
+          if (err) {
+            // if there is an error with the query, log the error
+            logger.error("Problem getting requirements: \n", err);
+            res.status(400).send('Problem getting requirements:'); 
+          } else {
+            res.status(200).json({
+                "data":rows
+            });
+          }
+        });
+      }
+    });
+  
+  });
+
+  //get students/workers who havent been vaccinated
+  router.get('/admin/missing/',(req, res) => {
+    const username = req.params.username;
+    const token_info = jwt.decode(req.headers.authorization.split(' ')[1]);
+    const email = token_info.email;
+    var missing = [];
+    if(token_info.admin){
+      pool.getConnection((err, connection)=>{
+        if(err){
+          // if there is an issue obtaining a connection, release the connection instance and log the error
+          logger.error('Problem obtaining MySQL connection',err)
+          res.status(400).send('Problem obtaining MySQL connection'); 
+        } else {
+          
+          // if there is no issue obtaining a connection, execute query and release connection
+          connection.query('SELECT first_name, last_name, email, username FROM user WHERE username IN (SELECT record_holder FROM viewer WHERE viewer = ?)',[email], async (err, rows, fields) => {
+            
+            if (err) {
+              // if there is an error with the query, log the error
+              logger.error("Problem getting requirements: \n", err);
+              res.status(400).send('Problem getting requirements:'); 
+            } else {
+              members = JSON.parse(JSON.stringify(rows));
+              console.log('members: ', members);
+              missing = get_bad_users(members,email, connection);
+              
+              connection.query('SELECT * FROM user WHERE 0 = 1', (err, rows, fields) => {
+                if (err) {
+                  // if there is an error with the query, log the error
+                  logger.error("Problem getting requirements: \n", err);
+                  res.status(400).send('Problem getting requirements:');
+                } else {
+                  res.status(200).json({
+                    "data":missing
+                  });
+                }
+              });
+
+             
+              
+              
+              // connection.release();
+              console.log('jdlksf\n');
+              
+          }
+
+      
+             
+              
+              
+            
+        });
+        }
+
+      });
+      
+    }else{
+      res.status(400).send('Not an admin');
+    }
+
+
+  });
+//get all workers/students in organization
+router.get('/admin/members', authenticateJWT, (req, res) => {
+  const token_info = jwt.decode(req.headers.authorization.split(' ')[1]);
+  console.log("testing");
+  if (token_info.admin){
+    const email = token_info.email;
+    pool.getConnection(function (err, connection){
+      if(err){
+        // if there is an issue obtaining a connection, release the connection instance and log the error
+        logger.error('Problem obtaining MySQL connection',err)
+        res.status(400).send('Problem obtaining MySQL connection'); 
+      } else {
+        // if there is no issue obtaining a connection, execute query and release connection
+        connection.query('SELECT first_name, last_name, email, username FROM user WHERE username IN (SELECT record_holder from viewer WHERE viewer = ?);',[email], function (err, rows, fields) {
+          connection.release();
+          if (err) {
+            // if there is an error with the query, log the error
+            logger.error("Problem getting members: \n", err);
+            res.status(400).send('Problem getting members:'); 
+          } else {
+            res.status(201).json({
+                "data":rows
+            });
+          }
+        });
+      }
+    });
+
+  }else{
+    res.status(400).send('Not an admin');
+  }
+
+});
+
+
  module.exports = router;
 
  
