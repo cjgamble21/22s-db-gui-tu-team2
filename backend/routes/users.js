@@ -517,7 +517,8 @@ router.post('/', (req, res) => {
                   res.status(400).send('Problem getting requirements:');
                 } else {
                   res.status(200).json({
-                    "data":missing
+                    "data":missing,
+                    "percentage":(missing.length/members.length)*100
                   });
                 }
               });
