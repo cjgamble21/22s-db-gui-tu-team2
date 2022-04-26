@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 //get all vaccines or filter by name AND manufacturer
-router.get('/vaccine', (req, res) => {
+router.get('/', (req, res) => {
     // obtain a connection from our pool of connections
     pool.getConnection(function (err, connection){
       if(err){

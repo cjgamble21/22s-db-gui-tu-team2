@@ -2,8 +2,9 @@ const pool = require('./db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const accessTokenSecret = 'youraccesstokensecret';
-const refreshTokenSecret = 'yourrefreshtokensecrethere';
-let refreshTokens = [];
+// const refreshTokenSecret = 'yourrefreshtokensecrethere';
+// let refreshTokens = [];
+
 const authenticateJWT = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -194,6 +195,9 @@ module.exports = function routes(app, logger) {
   //get vaccines info
   //get vaccine side effects route
   app.get('/side-affects', (req, res) => {
+    const vacc_name = req.query.name;
+    const vacc_man = req.query.manufacturer;
+    console.log(req.query);
     // obtain a connection from our pool of connections
     pool.getConnection(function (err, connection){
       if(err){
@@ -202,8 +206,7 @@ module.exports = function routes(app, logger) {
         res.status(400).send('Problem obtaining MySQL connection'); 
       } else {
         // if there is no issue obtaining a connection, execute query and release connection
-        const vacc_name = req.body.name
-        const vacc_man = req.body.manufacturer 
+        
         if(vacc_name && vacc_man){
           connection.query('SELECT (side_affect) FROM `vaccine_app`.`side_affects` WHERE vacc_name = ? AND vacc_manu = ?', [vacc_name,vacc_man], function (err, rows, fields) {
             connection.release();
