@@ -340,7 +340,7 @@ router.post('/', (req, res) => {
         res.status(400).send('Problem obtaining MySQL connection'); 
       } else {
         // if there is no issue obtaining a connection, execute query and release connection
-        connection.query('Update user SET first_name = IFNULL(?, first_name), last_name = IFNULL(?, last_name), age = IFNULL(?, age),email = IFNULL(?, email) WHERE ID = ?',[req.body.first_name, req.body.last_name, req.body.age, req.body.email,id], function (err, rows, fields) {
+        connection.query('Update user SET first_name = IFNULL(?, first_name), last_name = IFNULL(?, last_name), age = IFNULL(?, age),email = IFNULL(?, email), username = IFNULL(?, username) WHERE ID = ?',[req.body.first_name, req.body.last_name, req.body.age, req.body.email,req.body.username,id], function (err, rows, fields) {
           connection.release();
           if (err) {
             // if there is an error with the query, log the error
@@ -580,6 +580,58 @@ router.get('/admin/members', authenticateJWT, (req, res) => {
   }
 
 });
+
+//get all profiles a user can view
+router.get('/:id/viewable', authenticateJWT, (req, res) => {
+  const token_info = jwt.decode(req.headers.authorization.split(' ')[1]);
+  console.log('getting viewers');
+  const id = req.params.id;
+  const view_user  = req.query.view;
+  const email = token_info.email;
+    pool.getConnection(function (err, connection){
+      if(err){
+        // if there is an issue obtaining a connection, release the connection instance and log the error
+        logger.error('Problem obtaining MySQL connection',err)
+        res.status(400).send('Problem obtaining MySQL connection'); 
+      } else {
+        // if there is no issue obtaining a connection, execute query and release connection
+        if (!view_user){
+        console.log('no specific user');
+        connection.query('SELECT first_name, last_name, email, username FROM user WHERE username IN (SELECT record_holder FROM viewer WHERE viewer = ?)',[email], function (err, rows, fields) {
+          connection.release();
+          if (err) {
+            // if there is an error with the query, log the error
+            logger.error("Problem getting members: \n", err);
+            res.status(400).send('Problem getting members:'); 
+          } else {
+            res.status(201).json({
+                "data":rows
+            });
+          }
+        });
+      }
+      else{
+        console.log('specific user');
+        connection.query('SELECT manufacturer, name, date FROM vaccine_user WHERE username = ? AND (SELECT CASE WHEN EXISTS (SELECT viewer FROM viewer WHERE record_holder = ? and viewer = ?) THEN TRUE ELSE FALSE END) = TRUE', [view_user, view_user, email], function (err, rows, fields) {
+          connection.release();
+          if (err) {
+            // if there is an error with the query, log the error
+            logger.error("Problem getting members: \n", err);
+            res.status(400).send('Problem getting members:'); 
+          } else {
+            res.status(201).json({
+                "data":rows
+            });
+          }
+        }
+      );
+       
+      }
+      }
+    });
+  });
+  
+
 
 
  module.exports = router;

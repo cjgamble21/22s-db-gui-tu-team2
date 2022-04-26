@@ -2,8 +2,8 @@ const pool = require('./db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const accessTokenSecret = 'youraccesstokensecret';
-// const refreshTokenSecret = 'yourrefreshtokensecrethere';
-// let refreshTokens = [];
+const refreshTokenSecret = 'yourrefreshtokensecrethere';
+let refreshTokens = [];
 
 const authenticateJWT = (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -138,6 +138,7 @@ module.exports = function routes(app, logger) {
     
     const payload = req.body;
     const password = payload.password;
+    console.log(payload);
     // obtain a connection from our pool of connections
     pool.getConnection(function (err, connection){
       if(err){
@@ -148,7 +149,7 @@ module.exports = function routes(app, logger) {
         // if there is no issue obtaining a connection, execute query and release connection
         connection.query('SELECT * FROM user WHERE username = ?',[payload.username], function (err, rows, fields){
           connection.release();
-          
+          // console.log(rows);
           const user = rows[0];
           // console.log(user);
           
