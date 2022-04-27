@@ -149,7 +149,7 @@ module.exports = function routes(app, logger) {
         // if there is no issue obtaining a connection, execute query and release connection
         connection.query('SELECT * FROM user WHERE username = ?',[payload.username], function (err, rows, fields){
           connection.release();
-          // console.log(rows);
+          // console.lçog(rows);
           const user = rows[0];
           // console.log(user);
           

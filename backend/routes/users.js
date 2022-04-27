@@ -36,7 +36,7 @@ const parsejwt = (token, next) => {
 
 const get_bad_users = (members,email, connection, res) => { 
   let missing = [];
-  console.log('startquery\n');
+  
   async.forEachOf(members, (member, key, callback) => {
     connection.query('SELECT DISTINCT vacc_name FROM (select vacc_name from requirement where inst_name = (SELECT name FROM institution WHERE admin_email = ?))t LEFT JOIN (select name from vaccine_user where username = ?)k ON t.vacc_name = k.name WHERE k.name IS NULL', [email, member.username], function (err, rows, fields) {
       if (err) {
@@ -584,7 +584,7 @@ router.get('/admin/members', authenticateJWT, (req, res) => {
 //get all profiles a user can view
 router.get('/:id/viewable', authenticateJWT, (req, res) => {
   const token_info = jwt.decode(req.headers.authorization.split(' ')[1]);
-  console.log('getting viewers');
+  
   const id = req.params.id;
   const view_user  = req.query.view;
   const email = token_info.email;
@@ -611,7 +611,7 @@ router.get('/:id/viewable', authenticateJWT, (req, res) => {
         });
       }
       else{
-        console.log('specific user');
+        
         connection.query('SELECT manufacturer, name, date FROM vaccine_user WHERE username = ? AND (SELECT CASE WHEN EXISTS (SELECT viewer FROM viewer WHERE record_holder = ? and viewer = ?) THEN TRUE ELSE FALSE END) = TRUE', [view_user, view_user, email], function (err, rows, fields) {
           connection.release();
           if (err) {
