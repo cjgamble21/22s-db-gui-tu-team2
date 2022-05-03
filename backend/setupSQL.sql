@@ -105,3 +105,14 @@ VALUES ('DoraN', 'Gardasil', 'HPV vaccine', '2005-10-10');
 
 insert into viewer(record_holder, viewer, relationship) VALUES
 ('fordj626','KD@kyrieabitch.com','Manager at work');
+
+SELECT manufacturer, name, date FROM vaccine_user WHERE username = 'fordj626' AND (SELECT
+      CASE WHEN EXISTS
+      (
+            SELECT viewer FROM viewer WHERE record_holder = 'Trae' and viewer = 'kd@kyrieabitch.com'
+      )
+      THEN TRUE
+      ELSE FALSE
+   END) = TRUE
+
+SELECT first_name, last_name, email, username FROM user WHERE username IN (SELECT record_holder from viewer WHERE viewer = 'kd@kyrieabitch.com');
