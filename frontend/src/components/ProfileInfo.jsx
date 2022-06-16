@@ -1,3 +1,5 @@
+import InputField from "./InputField"
+
 export const StaticProfileInfo = ({ firstName, lastName, age, email, username, organization }) => {
     return (<>
         <div className='row'>
@@ -48,14 +50,14 @@ export const StaticProfileInfo = ({ firstName, lastName, age, email, username, o
     )
 }
 
-export const DynamicProfileInfo = ({ firstName, lastName, age, email, username }) => {
+export const DynamicProfileInfo = ({ name, setName, age, setAge, email, setEmail, username, setUsername, organization, setOrganization }) => {
     return (<>
         <div className='row'>
             <div className='col-sm-3'>
-                <h6 className='mb-0'>Name</h6>
+                <h6 className="mb-0">Name</h6>
             </div>
             <div className='col-sm-9'>
-                <p className='mb-0 text-muted'>{firstName} {lastName}</p>
+                <InputField type="text" id="name" placeholder={name} value={name} setValue={setName} />
             </div>
         </div>
         <hr />
@@ -64,7 +66,7 @@ export const DynamicProfileInfo = ({ firstName, lastName, age, email, username }
                 <h6 className='mb-0'>Email</h6>
             </div>
             <div className='col-sm-9'>
-                <p className='mb-0 text-muted'>{email}</p>
+                <InputField type="text" id="email" placeholder={email} value={email} setValue={setEmail} />
             </div>
         </div>
         <hr />
@@ -73,7 +75,7 @@ export const DynamicProfileInfo = ({ firstName, lastName, age, email, username }
                 <h6 className='mb-0'>Username</h6>
             </div>
             <div className='col-sm-9'>
-                <p className='mb-0 text-muted'>{username}</p>
+                <InputField type="text" id="username" placeholder={username} value={username} setValue={setUsername} />
             </div>
         </div>
         <hr />
@@ -82,7 +84,16 @@ export const DynamicProfileInfo = ({ firstName, lastName, age, email, username }
                 <h6 className='mb-0'>Age</h6>
             </div>
             <div className='col-sm-9'>
-                <p className='mb-0 text-muted'>{age}</p>
+                <InputField type="text" id="age" placeholder={age} value={age} setValue={setAge} />
+            </div>
+        </div>
+        <hr />
+        <div className='row'>
+            <div className='col-sm-3'>
+                <h6 className='mb-0'>Organization</h6>
+            </div>
+            <div className='col-sm-9'>
+                <InputField type="text" id="organization" placeholder={organization} value={organization} setValue={setOrganization} />
             </div>
         </div>
     </>

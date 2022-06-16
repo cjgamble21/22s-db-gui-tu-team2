@@ -98,7 +98,7 @@ const Login = () => {
                     <h1 className="mb-3">Login</h1>
                     <div className="form-group mb-3">
                         <label htmlFor="username">Username</label>
-                        <InputField type="text" id="username" value={username} setValue={setUsername} ref={userRef} />
+                        <InputField type="text" id="username" placeholder="" value={username} setValue={setUsername} ref={userRef} />
                         {!validUsername && !formValid && <div className="username-error">
                             <p>Username must be 3 or more characters</p>
                         </div>}
@@ -106,7 +106,7 @@ const Login = () => {
 
                     <div className="form-group mb-3">
                         <label htmlFor="password">Password</label>
-                        <InputField type="password" id="password" value={password} setValue={setPassword}
+                        <InputField type="password" id="password" placeholder="" value={password} setValue={setPassword}
                             valid={validPassword} setValid={setValidPassword} />
                         {!validPassword && !formValid && <div className="password-error">
                             <p>Password must be 3 or more characters</p>

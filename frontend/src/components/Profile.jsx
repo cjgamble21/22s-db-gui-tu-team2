@@ -12,8 +12,12 @@ const Profile = () => {
     const [modal, setModal] = useState(false);
     const { auth } = useAuth();
     // const username = jwt(auth.token).username;
-    let username = null;
+    // let username = null;
     // console.log(username);
+
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
 
     const navigate = useNavigate();
 
@@ -114,8 +118,9 @@ const Profile = () => {
                                             <Modal.Title>Edit Profile</Modal.Title>
                                         </Modal.Header>
                                         <Modal.Body>
-                                            <DynamicProfileInfo firstName={user.first_name} lastName={user.last_name}
-                                                age={user.age} email={user.email} username={user.username} />
+                                            <DynamicProfileInfo name={user.first_name + " " + user.last_name}
+                                                age={user.age} email={user.email} username={user.username}
+                                                organization={user.organization} />
                                         </Modal.Body>
                                         <Modal.Footer>
                                             <Button variant="secondary" onClick={handleHide}>

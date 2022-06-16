@@ -16,6 +16,7 @@ export const ProfileVaccineList = ({ vaccines, addVaccine }) => {
     const handleShow = () => setModal(true);
     const handleHide = () => setModal(false);
 
+    // Handle submit function for vaccine modal
     const handleSubmit = () => {
         let vaccine = {
             name: vaccineName,
@@ -44,6 +45,7 @@ export const ProfileVaccineList = ({ vaccines, addVaccine }) => {
                         Add a vaccine
                     </Button>
                 </li>
+                {/* Vaccine modal */}
                 <Modal show={modal} onHide={handleHide} onEntered={() => nameRef.current.focus()}>
                     <Modal.Header closeButton>
                         <Modal.Title>Add New Vaccine</Modal.Title>
