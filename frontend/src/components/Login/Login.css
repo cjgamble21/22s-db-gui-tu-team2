@@ -1,6 +1,6 @@
 .login .bg {
     height: 100vh;
-    background-color:#E0E0E0;
+    background-color: #E0E0E0;
 }
 
 .login form {
@@ -20,10 +20,13 @@
     color: #eee;
 }
 
-.password-error, .username-error, .login-error {
+.password-error,
+.username-error,
+.login-error {
     color: red;
 }
 
-.password-error, .username-error {
+.password-error,
+.username-error {
     text-align: left;
 }
