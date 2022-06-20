@@ -1,6 +1,7 @@
 import { Button, Modal } from 'react-bootstrap';
 import { useState, useRef, useEffect } from 'react';
 import InputField from './InputField';
+import { addVaccine } from '../api/profileApi';
 
 export const ProfileVaccineList = ({ vaccines, addVaccine }) => {
 

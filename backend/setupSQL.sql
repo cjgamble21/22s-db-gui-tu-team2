@@ -43,8 +43,7 @@ create table vaccine_user(
     name VARCHAR(25),
     date DATE NOT NULL,
     private BIT DEFAULT TRUE,
-    FOREIGN KEY (name,manufacturer) REFERENCES vaccine(name, manufacturer),
-    image VARCHAR(110) NOT NULL
+    image VARCHAR(110) 
 
 );
 
