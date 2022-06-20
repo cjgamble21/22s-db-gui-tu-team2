@@ -5,19 +5,21 @@ import { Modal, Button } from 'react-bootstrap';
 import { StaticProfileInfo, DynamicProfileInfo } from './ProfileInfo';
 import { ProfileVaccineList } from './ProfileVaccineList';
 import { useNavigate } from 'react-router-dom';
+import { getUserById, addVaccine } from '../api/profileApi';
 
 
 const Profile = () => {
     const [profile, setProfile] = useState({});
     const [modal, setModal] = useState(false);
     const { auth } = useAuth();
-    // const username = jwt(auth.token).username;
+    const token = jwt(auth.token);
     // let username = null;
     // console.log(username);
 
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
+    const [vaccines, setVaccines] = useState([]);
 
     const navigate = useNavigate();
 
@@ -30,25 +32,36 @@ const Profile = () => {
     const handleShow = () => setModal(true);
     const handleHide = () => setModal(false);
 
-    const addVaccine = vaccine => vaccines.push(vaccine);
+    // const addVaccines = async vaccine => {
+    //     const response = await addVaccine(user, vaccine)
+    // }
 
-    const vaccines = [
-        {
-            name: 'COVID-19',
-            issuer: 'Pfizer',
-            days_passed: 20
-        },
-        {
-            name: 'Measles',
-            issuer: 'Pfizer',
-            days_passed: 130
-        },
-        {
-            name: 'Tetanus',
-            issuer: 'J&J',
-            days_passed: 365
-        }
-    ]
+    useEffect(async () => {
+        const user = await getUserById(token.id);
+        setName(user.name);
+        setEmail(user.email);
+        setUsername(user.username);
+        console.log(token);
+        console.log(user);
+    }, [])
+
+    // const vaccines = [
+    //     {
+    //         name: 'COVID-19',
+    //         issuer: 'Pfizer',
+    //         days_passed: 20
+    //     },
+    //     {
+    //         name: 'Measles',
+    //         issuer: 'Pfizer',
+    //         days_passed: 130
+    //     },
+    //     {
+    //         name: 'Tetanus',
+    //         issuer: 'J&J',
+    //         days_passed: 365
+    //     }
+    // ]
 
     // Need to call user from the API here...I'll create a basic user for now
     let user = {
