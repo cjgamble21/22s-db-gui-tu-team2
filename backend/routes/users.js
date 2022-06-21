@@ -105,7 +105,7 @@ router.post('/:id/dose', (req, res) => {
       res.status(400).send('Problem obtaining MySQL connection');
     } else {
       // if there is no issue obtaining a connection, execute query and release connection
-      connection.query('INSERT INTO vaccine_user (`username`,`name`,`manufacturer`,`date`,`private`,`image`) VALUES(?,?,?,?,?,?)', [id, payload.name, payload.manufacturer, payload.date, payload.private, payload.image], function (err, rows, fields) {
+      connection.query('INSERT INTO vaccine_user (`id`,`name`,`manufacturer`,`date`,`private`,`image`) VALUES(?,?,?,?,?,?)', [id, payload.name, payload.manufacturer, payload.date, payload.private, payload.image], function (err, rows, fields) {
         connection.release();
         if (err) {
           // if there is an error with the query, log the error

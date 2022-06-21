@@ -5,7 +5,7 @@ import { Form, Modal, Button } from 'react-bootstrap';
 import { StaticProfileInfo, DynamicProfileInfo } from './ProfileInfo';
 import { ProfileVaccineList } from './ProfileVaccineList';
 import { useNavigate } from 'react-router-dom';
-import { getUserById, updateUserInfo, addVaccine } from '../api/profileApi';
+import { getUserById, updateUserInfo, addVaccine, getVaccines } from '../api/profileApi';
 
 
 const Profile = () => {
@@ -39,9 +39,11 @@ const Profile = () => {
         setModal(false);
     }
 
-    // const addVaccines = async vaccine => {
-    //     const response = await addVaccine(user, vaccine)
-    // }
+    const addVaccines = async vaccine => {
+        const response = await addVaccine(token.id, vaccine)
+        console.log(response);
+        console.log(vaccines);
+    }
 
     useEffect(async () => {
         const data = await getUserById(token.id);
@@ -56,6 +58,10 @@ const Profile = () => {
         setAge(_user.age);
         console.log(token);
         console.log(_user);
+
+        const _vaccines = await getVaccines(token.id);
+        setVaccines(_vaccines.data);
+        console.log(_vaccines.data);
     }, [])
 
     // const vaccines = [
@@ -119,7 +125,7 @@ const Profile = () => {
                             Vaccine List
                         </div>
                         <div className='card-body p-0'>
-                            <ProfileVaccineList vaccines={vaccines} addVaccine={addVaccine} />
+                            <ProfileVaccineList vaccines={vaccines} setVaccines={setVaccines} addVaccines={addVaccines} />
                         </div>
                     </div>
                 </div>

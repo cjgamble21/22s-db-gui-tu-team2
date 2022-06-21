@@ -40,7 +40,7 @@ create table vaccine_user(
     username VARCHAR(15) REFERENCES user(username),
     manufacturer VARCHAR(25),
     name VARCHAR(25),
-    date DATE NOT NULL,
+    date DATE,
     private BIT DEFAULT TRUE,
     image VARCHAR(110) 
 
