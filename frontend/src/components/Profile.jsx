@@ -144,7 +144,7 @@ const Profile = () => {
                                     <Button variant="primary" onClick={handleShow}>
                                         Edit
                                     </Button>
-                                    <Modal show={modal} onSubmit={handleSubmit}>
+                                    <Modal show={modal} onHide={handleHide} onSubmit={handleSubmit}>
                                         <Modal.Header closeButton>
                                             <Modal.Title>Edit Profile</Modal.Title>
                                         </Modal.Header>
