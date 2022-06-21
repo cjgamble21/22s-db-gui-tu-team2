@@ -1,23 +1,25 @@
 import { useState, useEffect } from 'react';
 import jwt from 'jwt-decode';
 import { useAuth } from '../hooks/useAuth';
-import { Modal, Button } from 'react-bootstrap';
+import { Form, Modal, Button } from 'react-bootstrap';
 import { StaticProfileInfo, DynamicProfileInfo } from './ProfileInfo';
 import { ProfileVaccineList } from './ProfileVaccineList';
 import { useNavigate } from 'react-router-dom';
+import { getUserById, updateUserInfo, addVaccine, getVaccines } from '../api/profileApi';
 
 
 const Profile = () => {
     const [profile, setProfile] = useState({});
     const [modal, setModal] = useState(false);
     const { auth } = useAuth();
-    // const username = jwt(auth.token).username;
-    // let username = null;
-    // console.log(username);
+    const token = jwt(auth.token);
 
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
+    const [age, setAge] = useState(0);
+    const [organization, setOrganization] = useState("");
+    const [vaccines, setVaccines] = useState([]);
 
     const navigate = useNavigate();
 
@@ -29,34 +31,66 @@ const Profile = () => {
     // Modal methods
     const handleShow = () => setModal(true);
     const handleHide = () => setModal(false);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        console.log("Submitted!");
+        console.log(name, age, email, username, organization);
+        const status = await updateUserInfo(token.id, { name, age, email, username, organization });
+        console.log(status);
+        setModal(false);
+    }
 
-    const addVaccine = vaccine => vaccines.push(vaccine);
+    const addVaccines = async vaccine => {
+        const response = await addVaccine(token.id, vaccine)
+        console.log(response);
+        console.log(vaccines);
+    }
 
-    const vaccines = [
-        {
-            name: 'COVID-19',
-            issuer: 'Pfizer',
-            days_passed: 20
-        },
-        {
-            name: 'Measles',
-            issuer: 'Pfizer',
-            days_passed: 130
-        },
-        {
-            name: 'Tetanus',
-            issuer: 'J&J',
-            days_passed: 365
-        }
-    ]
+    useEffect(async () => {
+        const data = await getUserById(token.id);
+        let _user = data.data[0]
+
+        if (_user.name && _user.name != token.username)
+            token.username = Object.assign(_user.name);
+
+        setName(_user.name);
+        setEmail(_user.email);
+        setUsername(_user.username);
+        setAge(_user.age);
+        setOrganization(_user.organization)
+        console.log(token);
+        console.log(_user);
+
+        const _vaccines = await getVaccines(token.id);
+        setVaccines(_vaccines.data);
+        console.log(_vaccines.data);
+    }, [])
+
+    // const vaccines = [
+    //     {
+    //         name: 'COVID-19',
+    //         issuer: 'Pfizer',
+    //         days_passed: 20
+    //     },
+    //     {
+    //         name: 'Measles',
+    //         issuer: 'Pfizer',
+    //         days_passed: 130
+    //     },
+    //     {
+    //         name: 'Tetanus',
+    //         issuer: 'J&J',
+    //         days_passed: 365
+    //     }
+    // ]
 
     // Need to call user from the API here...I'll create a basic user for now
     let user = {
-        username: 'cjgamble21',
-        first_name: 'Connor',
-        last_name: 'Gamble',
-        email: 'cjgamble21@gmail.com',
-        age: 21,
+        // username: 'cjgamble21',
+        // first_name: 'Connor',
+        // last_name: 'Gamble',
+        // email: 'cjgamble21@gmail.com',
+        // age: 21,
         organization: 'Southern Methodist University'
     }
 
@@ -79,10 +113,10 @@ const Profile = () => {
                     <div className='card mb-4'>
                         <div className="card-body text-center">
                             <img src="https://via.placeholder.com/150" alt="avatar" className="rounded-circle img-fluid w-3" />
-                            <h5 className='my-3'> {user.first_name} {user.last_name} </h5>
-                            <p className='text-muted mb-1'>{user.username}</p>
-                            <p className='text-muted mb-1'>{user.email}</p>
-                            <p className='mb-4 fw-bold'>{user.organization}</p>
+                            <h5 className='my-3'> {name} </h5>
+                            <p className='text-muted mb-1'>{username}</p>
+                            <p className='text-muted mb-1'>{email}</p>
+                            <p className='mb-4 fw-bold'>{organization}</p>
                             <Button variant="primary" className='mb-4' onClick={logout}>
                                 Logout
                             </Button>
@@ -93,7 +127,7 @@ const Profile = () => {
                             Vaccine List
                         </div>
                         <div className='card-body p-0'>
-                            <ProfileVaccineList vaccines={vaccines} addVaccine={addVaccine} />
+                            <ProfileVaccineList vaccines={vaccines} setVaccines={setVaccines} addVaccines={addVaccines} />
                         </div>
                     </div>
                 </div>
@@ -104,29 +138,28 @@ const Profile = () => {
                             <h5>User Information</h5>
                         </div>
                         <div className='card-body'>
-                            <StaticProfileInfo firstName={user.first_name} lastName={user.last_name}
-                                age={user.age} email={user.email} username={user.username} organization={user.organization} />
+                            <StaticProfileInfo name={name}
+                                age={age} email={email} username={username} organization={organization} />
                             <hr />
                             <div className='row'>
                                 <div className='col-sm-10'>
                                     <Button variant="primary" onClick={handleShow}>
                                         Edit
                                     </Button>
-
-                                    <Modal show={modal} onHide={handleHide}>
+                                    <Modal show={modal} onHide={handleHide} onSubmit={handleSubmit}>
                                         <Modal.Header closeButton>
                                             <Modal.Title>Edit Profile</Modal.Title>
                                         </Modal.Header>
                                         <Modal.Body>
-                                            <DynamicProfileInfo name={user.first_name + " " + user.last_name}
-                                                age={user.age} email={user.email} username={user.username}
-                                                organization={user.organization} />
+                                            <DynamicProfileInfo name={name} setName={setName}
+                                                age={age} setAge={setAge} email={email} setEmail={setEmail} username={username}
+                                                setUsername={setUsername} organization={organization} setOrganization={setOrganization} />
                                         </Modal.Body>
                                         <Modal.Footer>
                                             <Button variant="secondary" onClick={handleHide}>
                                                 Close
                                             </Button>
-                                            <Button variant="primary" onClick={handleHide}>
+                                            <Button variant="primary" onClick={handleSubmit}>
                                                 Save
                                             </Button>
                                         </Modal.Footer>
