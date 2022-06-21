@@ -22,6 +22,7 @@ const Register = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [age, setAge] = useState(undefined);
+    const [organization, setOrganization] = useState("");
 
     const [validUsername, setValidUsername] = useState(true);
     const [validPassword, setValidPassword] = useState(true);
@@ -173,6 +174,16 @@ const Register = () => {
                     <div className='form-group mb-3'>
                         <label htmlFor="age">Age</label>
                         <InputField type="text" id="age" placeholder="" value={age} setValue={setAge} />
+                    </div>
+
+                    <div className='form-group mb-3'>
+                        <label htmlFor='organization'>Organization</label>
+                        <select id="organization" className='form-control' onChange={e => setOrganization(e.target.value)}>
+                            <option value="Southern Methodist University">Southern Methodist University</option>
+                            <option value="University of Texas">University of Texas</option>
+                            <option value="Texas A&M University">Texas A&M University</option>
+                            <option value="University of North Texas">University of North Texas</option>
+                        </select>
                     </div>
 
                     <div className="mt-3 mb-3">

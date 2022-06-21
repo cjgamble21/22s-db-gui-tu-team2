@@ -135,7 +135,7 @@ router.post('/', (req, res) => {
     } else {
       if (!payload.admin) {
         // if there is no issue obtaining a connection, execute query and release connection
-        connection.query('INSERT INTO user (`name`,`age`,`username`,`password`,`email`) VALUES (?,?,?,?,?)', [payload?.name, payload?.age, payload?.username, hashword, payload?.email], function (err, rows, fields) {
+        connection.query('INSERT INTO user (`name`,`age`,`username`,`password`,`email`, `organization`) VALUES (?,?,?,?,?,?)', [payload?.name, payload?.age, payload?.username, hashword, payload?.email, payload?.organization], function (err, rows, fields) {
           connection.release();
           if (err) {
             // if there is an error with the query, log the error
@@ -199,7 +199,7 @@ router.put('/:id', (req, res) => {
       logger.error('Problem obtaining MySQL connection', err)
       res.status(400).send('Problem obtaining MySQL connection');
     } else {
-      conn.query('UPDATE user SET name = ?, age = ?, username = ?, email = ? WHERE id = ?', [req.body.name, req.body.age, req.body.username, req.body.email, id]);
+      conn.query('UPDATE user SET name = ?, age = ?, username = ?, email = ?, organization = ? WHERE id = ?', [req.body.name, req.body.age, req.body.username, req.body.email, req.body.organization, id]);
       conn.release();
       if (err) {
         // if there is an error with the query, log the error

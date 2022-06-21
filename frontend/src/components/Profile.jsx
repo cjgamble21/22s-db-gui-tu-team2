@@ -18,6 +18,7 @@ const Profile = () => {
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
     const [age, setAge] = useState(0);
+    const [organization, setOrganization] = useState("");
     const [vaccines, setVaccines] = useState([]);
 
     const navigate = useNavigate();
@@ -33,8 +34,8 @@ const Profile = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("Submitted!");
-        console.log(name, age, email, username);
-        const status = await updateUserInfo(token.id, { name, age, email, username });
+        console.log(name, age, email, username, organization);
+        const status = await updateUserInfo(token.id, { name, age, email, username, organization });
         console.log(status);
         setModal(false);
     }
@@ -56,6 +57,7 @@ const Profile = () => {
         setEmail(_user.email);
         setUsername(_user.username);
         setAge(_user.age);
+        setOrganization(_user.organization)
         console.log(token);
         console.log(_user);
 
@@ -114,7 +116,7 @@ const Profile = () => {
                             <h5 className='my-3'> {name} </h5>
                             <p className='text-muted mb-1'>{username}</p>
                             <p className='text-muted mb-1'>{email}</p>
-                            <p className='mb-4 fw-bold'>{user.organization}</p>
+                            <p className='mb-4 fw-bold'>{organization}</p>
                             <Button variant="primary" className='mb-4' onClick={logout}>
                                 Logout
                             </Button>
@@ -137,7 +139,7 @@ const Profile = () => {
                         </div>
                         <div className='card-body'>
                             <StaticProfileInfo name={name}
-                                age={age} email={email} username={username} organization={user.organization} />
+                                age={age} email={email} username={username} organization={organization} />
                             <hr />
                             <div className='row'>
                                 <div className='col-sm-10'>
@@ -151,7 +153,7 @@ const Profile = () => {
                                         <Modal.Body>
                                             <DynamicProfileInfo name={name} setName={setName}
                                                 age={age} setAge={setAge} email={email} setEmail={setEmail} username={username}
-                                                setUsername={setUsername} organization={user.organization} />
+                                                setUsername={setUsername} organization={organization} setOrganization={setOrganization} />
                                         </Modal.Body>
                                         <Modal.Footer>
                                             <Button variant="secondary" onClick={handleHide}>
