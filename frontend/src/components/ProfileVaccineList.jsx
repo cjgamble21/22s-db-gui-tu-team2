@@ -1,41 +1,50 @@
 import { Button, Modal } from 'react-bootstrap';
 import { useState, useRef, useEffect } from 'react';
 import InputField from './InputField';
-import { addVaccine } from '../api/profileApi';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import jwt from 'jwt-decode';
+import { deleteVaccine } from '../api/profileApi';
 import { useAuth } from '../hooks/useAuth';
+import jwt from 'jwt-decode';
 
 export const ProfileVaccineList = ({ vaccines, setVaccines, addVaccines }) => {
 
-    const [modal, setModal] = useState(false);
+    const { auth } = useAuth();
+    const token = jwt(auth.token);
+
+
+    const [addModal, setAddModal] = useState(false);
+    const [deleteModal, setDeleteModal] = useState(false);
 
     const [vaccineName, setVaccineName] = useState("");
     const [vaccineIssuer, setVaccineIssuer] = useState("");
     const [date, setDate] = useState(new Date());
 
-    const { auth } = useAuth();
-    const token = jwt(auth.token);
+    const addNameRef = useRef();
 
-    const nameRef = useRef();
+    const [checkedState, setCheckedState] = useState(
+        new Array(vaccines.length).fill(false)
+    );
 
     // Modal methods
-    const handleShow = () => setModal(true);
-    const handleHide = () => setModal(false);
+    const showAdd = () => setAddModal(true);
+    const showDelete = () => setDeleteModal(true);
+
+    const hideAdd = () => setAddModal(false);
+    const hideDelete = () => setDeleteModal(false);
 
     // Handle submit function for vaccine modal
-    const handleSubmit = () => {
+    const addSubmit = () => {
         let vaccine = {
             name: vaccineName,
             manufacturer: vaccineIssuer,
-            date: date
+            date: date,
         }
 
         console.log(vaccine);
 
         addVaccines(vaccine);
-        handleHide();
+        hideAdd();
 
         let _vaccines = Object.assign(vaccines);
         _vaccines.push(vaccine);
@@ -57,6 +66,38 @@ export const ProfileVaccineList = ({ vaccines, setVaccines, addVaccines }) => {
         }
     }
 
+    const handleCheckChange = (position) => {
+        const updatedCheckedState = checkedState.map((item, index) =>
+            index === position ? !item : item
+        );
+
+        setCheckedState(updatedCheckedState);
+    }
+
+    const deleteSubmit = () => {
+        let _vaccines = Object.assign(vaccines);
+        vaccines.forEach(async (vaccine, index) => {
+            if (checkedState[index]) {
+                const status = await deleteVaccine(token.id, vaccine.name);
+                console.log(status);
+                _vaccines.splice(index);
+                console.log(_vaccines);
+            }
+        })
+
+        setVaccines(_vaccines);
+        hideDelete();
+    }
+
+
+    useEffect(() => {
+        console.log(vaccines);
+        setCheckedState(new Array(vaccines.length).fill(false));
+    }, [vaccines, setVaccines])
+
+    useEffect(() => {
+
+    }, [setVaccines])
 
     return (
         <>
@@ -77,12 +118,15 @@ export const ProfileVaccineList = ({ vaccines, setVaccines, addVaccines }) => {
                 }
                 )}
                 <li className="list-group-item justify-content-left align-items-center p-3">
-                    <Button variant="primary" onClick={handleShow}>
+                    <Button variant="primary" onClick={showAdd}>
                         Add a vaccine
                     </Button>
+                    {vaccines.length > 0 && <Button variant="danger" className='float-end' onClick={showDelete}>
+                        Delete a vaccine
+                    </Button>}
                 </li>
                 {/* Vaccine modal */}
-                <Modal show={modal} onHide={handleHide} onEntered={() => nameRef.current.focus()}>
+                <Modal show={addModal} onHide={hideAdd} onEntered={() => addNameRef.current.focus()}>
                     <Modal.Header closeButton>
                         <Modal.Title>Add New Vaccine</Modal.Title>
                     </Modal.Header>
@@ -90,7 +134,7 @@ export const ProfileVaccineList = ({ vaccines, setVaccines, addVaccines }) => {
                         <div className='row mb-2'>
                             <label htmlFor="vaccine-name">Name</label>
                             <div className='col-sm-9'>
-                                <InputField type="text" id="vaccine-name" value={vaccineName} setValue={setVaccineName} ref={nameRef} />
+                                <InputField type="text" id="vaccine-name" value={vaccineName} setValue={setVaccineName} ref={addNameRef} />
                             </div>
                         </div>
                         <div className='row mb-2'>
@@ -104,11 +148,45 @@ export const ProfileVaccineList = ({ vaccines, setVaccines, addVaccines }) => {
                         </div>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button type="button" variant="secondary" onClick={handleHide}>
+                        <Button type="button" variant="secondary" onClick={hideAdd}>
                             Close
                         </Button>
-                        <Button type="button" variant="primary" onClick={handleSubmit}>
+                        <Button type="button" variant="primary" onClick={addSubmit}>
                             Save
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+
+                <Modal show={deleteModal} onHide={hideDelete}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Delete a vaccine</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <ul className='list-group rounded-3'>
+                            {vaccines.map((vaccine, index) => {
+                                console.log(vaccine);
+                                console.log(checkedState)
+                                return (
+                                    <li key={index} className="list-group-item justify-content-left align-items-center p-3">
+                                        <input type="checkbox"
+                                            id="check"
+                                            name={vaccine.name}
+                                            label={vaccine.name}
+                                            value={vaccine.name}
+                                            checked={checkedState[index]}
+                                            onChange={() => handleCheckChange(index)} />
+                                        <label htmlFor="check" className="ms-3">{vaccine.name}</label>
+                                    </li>
+                                )
+                            })}
+                        </ul>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button type="button" variant="secondary" onClick={hideDelete}>
+                            Close
+                        </Button>
+                        <Button type="button" variant="danger" onClick={deleteSubmit}>
+                            Delete
                         </Button>
                     </Modal.Footer>
                 </Modal>

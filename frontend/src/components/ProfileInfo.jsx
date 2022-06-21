@@ -93,7 +93,8 @@ export const DynamicProfileInfo = ({ name, setName, age, setAge, email, setEmail
                 <h6 className='mb-0'>Organization</h6>
             </div>
             <div className='col-sm-9'>
-                <select id="organization" onChange={e => { setOrganization(e.target.value) }}>
+                <select id="organization" default={organization} onChange={e => { setOrganization(e.target.value) }}>
+                    <option value="" selected="selected"></option>
                     <option value="Southern Methodist University">Southern Methodist University</option>
                     <option value="University of Texas">University of Texas</option>
                     <option value="Texas A&M University">Texas A&M University</option>

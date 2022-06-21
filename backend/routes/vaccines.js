@@ -75,4 +75,26 @@ router.get('/:id', (req, res) => {
     }
   })
 })
+
+router.delete('/:id/:name', (req, res) => {
+  pool.getConnection((err, conn) => {
+    if (err) {
+      logger.error('Problem obtaining MySQL connection', err)
+      res.status(400).send('Problem obtaining MySQL connection');
+    } else {
+      conn.query('DELETE FROM vaccine_user WHERE name = ? && id = ?', [req.params.name, req.params.id], (err, rows, fields) => {
+        if (err) {
+          logger.error("Error fetching vaccines", err);
+          res.status(200).json({
+            "Error": "Error fetching vaccines"
+          })
+        } else {
+          res.status(200).json({
+            "data": rows
+          })
+        }
+      })
+    }
+  })
+})
 module.exports = router;

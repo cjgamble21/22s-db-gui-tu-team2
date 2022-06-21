@@ -41,4 +41,13 @@ export const addVaccine = (id, vaccine) => new Promise((resolve, reject) => {
             reject(x);
             alert(x);
         })
-}); 
+});
+
+export const deleteVaccine = (id, vaccineName) => new Promise((resolve, reject) => {
+    axios.delete(`${vaccines_url}/${id}/${vaccineName}`, apiConfig)
+        .then(x => resolve(x.status))
+        .catch(x => {
+            reject(x);
+            alert(x);
+        })
+})
