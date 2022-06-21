@@ -19,6 +19,9 @@ const Register = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [passwordConfirmation, setPasswordConfirmation] = useState("");
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [age, setAge] = useState(undefined);
 
     const [validUsername, setValidUsername] = useState(true);
     const [validPassword, setValidPassword] = useState(true);
@@ -79,7 +82,10 @@ const Register = () => {
 
         let user = {
             username: username,
-            password: password
+            password: password,
+            email: email,
+            age: age,
+            name: name
         }
 
         try {
@@ -153,6 +159,21 @@ const Register = () => {
                     {!passwordsMatch && !formValid && <div className="confirmation-error">
                         <p>Passwords must match</p>
                     </div>}
+
+                    <div className='form-group mb-3'>
+                        <label htmlFor='name'>Name</label>
+                        <InputField type="text" id="name" placeholder="" value={name} setValue={setName} />
+                    </div>
+
+                    <div className="form-group mb-3">
+                        <label htmlFor="email">Email</label>
+                        <InputField type="text" id="email" placeholder="" value={email} setValue={setEmail} />
+                    </div>
+
+                    <div className='form-group mb-3'>
+                        <label htmlFor="age">Age</label>
+                        <InputField type="text" id="age" placeholder="" value={age} setValue={setAge} />
+                    </div>
 
                     <div className="mt-3 mb-3">
                         <button className="btn btn-lg btn-primary w-100">Register</button>

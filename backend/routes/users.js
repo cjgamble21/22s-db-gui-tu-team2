@@ -142,7 +142,7 @@ router.post('/', (req, res) => {
             logger.error("Problem inserting into test table: \n", err);
             res.status(400).send('Problem inserting into table');
           } else {
-            res.status(200).send(`added ${req.body.first_name} ${payload.last_name} to the table!`);
+            res.status(200).send(`added ${payload.name} to the table!`);
           }
         });
 
@@ -188,6 +188,29 @@ router.post('/', (req, res) => {
 
   });
 });
+
+router.put('/:id', (req, res) => {
+  console.log(req.body);
+  const id = req.params.id;
+  console.log(id);
+
+  pool.getConnection((err, conn) => {
+    if (err) {
+      logger.error('Problem obtaining MySQL connection', err)
+      res.status(400).send('Problem obtaining MySQL connection');
+    } else {
+      conn.query('UPDATE user SET name = ?, age = ?, username = ?, email = ? WHERE id = ?', [req.body.name, req.body.age, req.body.username, req.body.email, id]);
+      conn.release();
+      if (err) {
+        // if there is an error with the query, log the error
+        logger.error("Problem updating user table \n", err);
+        res.status(400).send('Problem updating user table');
+      } else {
+        res.status(200).send(`Updated ${req.body.username}'s info!`);
+      }
+    }
+  })
+})
 
 
 router.post('/:id/viewers', (req, res) => {
@@ -314,7 +337,7 @@ router.get('/:id', (req, res) => {
       res.status(400).send('Problem obtaining MySQL connection');
     } else {
       // if there is no issue obtaining a connection, execute query and release connection
-      connection.query('select * from user where ID = ?', [id], function (err, rows, fields) {
+      connection.query('select * from user where id = ?', [id], function (err, rows, fields) {
         connection.release();
         if (err) {
           // if there is an error with the query, log the error

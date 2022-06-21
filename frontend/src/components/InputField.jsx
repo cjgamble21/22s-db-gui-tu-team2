@@ -15,7 +15,7 @@ const InputField = ({ type, id, placeholder, value, setValue }, ref) => {
                 ref={inputRef} // ref for focusing purposes
                 autoComplete="off"
                 onChange={e => setValue(e.target.value)}
-                value={value}
+                value={value || ""}
                 required>
             </input>
         </>

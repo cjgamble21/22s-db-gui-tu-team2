@@ -13,7 +13,16 @@ export const getUserById = id => new Promise((resolve, reject) => {
             reject(x);
             alert(x);
         })
-})
+});
+
+export const updateUserInfo = (id, user) => new Promise((resolve, reject) => {
+    axios.put(`${users_url}/${id}`, user, apiConfig)
+        .then(x => resolve(x.status))
+        .catch(x => {
+            reject(x);
+            alert(x);
+        })
+});
 
 export const addVaccine = user => new Promise((resolve, reject) => {
     axios.post(`${users_url}/${user.name}/dose`, user, apiConfig)

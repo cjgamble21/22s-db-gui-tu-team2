@@ -57,7 +57,7 @@ export const DynamicProfileInfo = ({ name, setName, age, setAge, email, setEmail
                 <h6 className="mb-0">Name</h6>
             </div>
             <div className='col-sm-9'>
-                <InputField type="text" id="name" placeholder={name} value={name} setValue={setName} />
+                <InputField type="text" id="name" placeholder={name || ""} value={name} setValue={setName} />
             </div>
         </div>
         <hr />
@@ -66,7 +66,7 @@ export const DynamicProfileInfo = ({ name, setName, age, setAge, email, setEmail
                 <h6 className='mb-0'>Email</h6>
             </div>
             <div className='col-sm-9'>
-                <InputField type="text" id="email" placeholder={email} value={email} setValue={setEmail} />
+                <InputField type="text" id="email" placeholder={email || ""} value={email} setValue={setEmail} />
             </div>
         </div>
         <hr />
@@ -75,7 +75,7 @@ export const DynamicProfileInfo = ({ name, setName, age, setAge, email, setEmail
                 <h6 className='mb-0'>Username</h6>
             </div>
             <div className='col-sm-9'>
-                <InputField type="text" id="username" placeholder={username} value={username} setValue={setUsername} />
+                <InputField type="text" id="username" placeholder={username || ""} value={username} setValue={setUsername} />
             </div>
         </div>
         <hr />
@@ -84,7 +84,7 @@ export const DynamicProfileInfo = ({ name, setName, age, setAge, email, setEmail
                 <h6 className='mb-0'>Age</h6>
             </div>
             <div className='col-sm-9'>
-                <InputField type="text" id="age" placeholder={age} value={age} setValue={setAge} />
+                <InputField type="text" id="age" placeholder={age || ""} value={age} setValue={setAge} />
             </div>
         </div>
         <hr />
@@ -93,7 +93,7 @@ export const DynamicProfileInfo = ({ name, setName, age, setAge, email, setEmail
                 <h6 className='mb-0'>Organization</h6>
             </div>
             <div className='col-sm-9'>
-                <InputField type="text" id="organization" placeholder={organization} value={organization} setValue={setOrganization} />
+                <InputField type="text" id="organization" placeholder={organization || ""} value={organization} setValue={setOrganization} />
             </div>
         </div>
     </>

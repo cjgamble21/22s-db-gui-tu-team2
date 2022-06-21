@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import jwt from 'jwt-decode';
 import { useAuth } from '../hooks/useAuth';
-import { Modal, Button } from 'react-bootstrap';
+import { Form, Modal, Button } from 'react-bootstrap';
 import { StaticProfileInfo, DynamicProfileInfo } from './ProfileInfo';
 import { ProfileVaccineList } from './ProfileVaccineList';
 import { useNavigate } from 'react-router-dom';
-import { getUserById, addVaccine } from '../api/profileApi';
+import { getUserById, updateUserInfo, addVaccine } from '../api/profileApi';
 
 
 const Profile = () => {
@@ -13,8 +13,6 @@ const Profile = () => {
     const [modal, setModal] = useState(false);
     const { auth } = useAuth();
     const token = jwt(auth.token);
-    // let username = null;
-    // console.log(username);
 
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -32,19 +30,32 @@ const Profile = () => {
     // Modal methods
     const handleShow = () => setModal(true);
     const handleHide = () => setModal(false);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        console.log("Submitted!");
+        console.log(name, age, email, username);
+        const status = await updateUserInfo(token.id, { name, age, email, username });
+        console.log(status);
+        setModal(false);
+    }
 
     // const addVaccines = async vaccine => {
     //     const response = await addVaccine(user, vaccine)
     // }
 
     useEffect(async () => {
-        const user = await getUserById(token.id);
-        setName(user.name);
-        setEmail(user.email);
-        setUsername(user.username);
-        setAge(user.age);
+        const data = await getUserById(token.id);
+        let _user = data.data[0]
+
+        if (_user.name && _user.name != token.username)
+            token.username = Object.assign(_user.name);
+
+        setName(_user.name);
+        setEmail(_user.email);
+        setUsername(_user.username);
+        setAge(_user.age);
         console.log(token);
-        console.log(user);
+        console.log(_user);
     }, [])
 
     // const vaccines = [
@@ -67,11 +78,11 @@ const Profile = () => {
 
     // Need to call user from the API here...I'll create a basic user for now
     let user = {
-        username: 'cjgamble21',
-        first_name: 'Connor',
-        last_name: 'Gamble',
-        email: 'cjgamble21@gmail.com',
-        age: 21,
+        // username: 'cjgamble21',
+        // first_name: 'Connor',
+        // last_name: 'Gamble',
+        // email: 'cjgamble21@gmail.com',
+        // age: 21,
         organization: 'Southern Methodist University'
     }
 
@@ -127,8 +138,7 @@ const Profile = () => {
                                     <Button variant="primary" onClick={handleShow}>
                                         Edit
                                     </Button>
-
-                                    <Modal show={modal} onHide={handleHide}>
+                                    <Modal show={modal} onSubmit={handleSubmit}>
                                         <Modal.Header closeButton>
                                             <Modal.Title>Edit Profile</Modal.Title>
                                         </Modal.Header>
@@ -141,7 +151,7 @@ const Profile = () => {
                                             <Button variant="secondary" onClick={handleHide}>
                                                 Close
                                             </Button>
-                                            <Button variant="primary" onClick={handleHide}>
+                                            <Button variant="primary" onClick={handleSubmit}>
                                                 Save
                                             </Button>
                                         </Modal.Footer>
