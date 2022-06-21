@@ -93,7 +93,12 @@ export const DynamicProfileInfo = ({ name, setName, age, setAge, email, setEmail
                 <h6 className='mb-0'>Organization</h6>
             </div>
             <div className='col-sm-9'>
-                <InputField type="text" id="organization" placeholder={organization || ""} value={organization} setValue={setOrganization} />
+                <select id="organization" required>
+                    <option value="smu">Southern Methodist University</option>
+                    <option value="ut">University of Texas</option>
+                    <option value="a&m">Texas A&M University</option>
+                    <option value="unt">University of North Texas</option>
+                </select>
             </div>
         </div>
     </>
