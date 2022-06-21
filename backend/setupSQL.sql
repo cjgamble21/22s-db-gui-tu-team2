@@ -15,8 +15,7 @@ ADD column time_valid INT;
 
 Create index user_index ON user(email);
 create table user(
-    first_name VARCHAR(15) NOT NULL,
-    last_name VARCHAR(25) NOT NULL,
+    name VARCHAR(40) NOT NULL,
     age INT NOT NULL,
     username VARCHAR(15) PRIMARY KEY,
     password VARCHAR(100) NOT NULL

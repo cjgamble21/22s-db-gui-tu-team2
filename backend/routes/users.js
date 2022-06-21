@@ -135,7 +135,7 @@ router.post('/', (req, res) => {
     } else {
       if (!payload.admin) {
         // if there is no issue obtaining a connection, execute query and release connection
-        connection.query('INSERT INTO user (`first_name`,`last_name`,`age`,`username`,`password`,`email`) VALUES(?,?,?,?,?,?)', [payload.first_name, payload.last_name, payload.age, payload.username, hashword, payload.email], function (err, rows, fields) {
+        connection.query('INSERT INTO user (`name`,`age`,`username`,`password`,`email`) VALUES (?,?,?,?,?)', [payload?.name, payload?.age, payload?.username, hashword, payload?.email], function (err, rows, fields) {
           connection.release();
           if (err) {
             // if there is an error with the query, log the error
@@ -149,7 +149,7 @@ router.post('/', (req, res) => {
       }
       else {
 
-        connection.query('INSERT INTO user (`first_name`,`last_name`,`age`,`username`,`password`,`email`,`admin`) VALUES(?,?,?,?,?,?,?)', [payload.first_name, payload.last_name, payload.age, payload.username, hashword, payload.email, payload.admin], function (err, rows, fields) {
+        connection.query('INSERT INTO user (`name`,`age`,`username`,`password`,`email`,`admin`) VALUES (?,?,?,?,?,?)', [payload.name, payload.age, payload.username, hashword, payload.email, payload.admin], function (err, rows, fields) {
           // connection.release();
           if (err) {
             // if there is an error with the query, log the error

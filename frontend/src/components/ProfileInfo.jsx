@@ -1,13 +1,13 @@
 import InputField from "./InputField"
 
-export const StaticProfileInfo = ({ firstName, lastName, age, email, username, organization }) => {
+export const StaticProfileInfo = ({ name, age, email, username, organization }) => {
     return (<>
         <div className='row'>
             <div className='col-sm-3'>
                 <h6 className='mb-0'>Name</h6>
             </div>
             <div className='col-sm-9'>
-                <p className='mb-0 text-muted'>{firstName} {lastName}</p>
+                <p className='mb-0 text-muted'>{name}</p>
             </div>
         </div>
         <hr />
